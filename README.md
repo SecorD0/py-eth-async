@@ -1,5 +1,7 @@
 <h1><p align="center">py-eth-async</p></h1><h1>
 
+<p align="center"><img src="images/icons/app.png" width="400"></p>
+
 
 
 <h1><p align="center">Content</p></h1>
