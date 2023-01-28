@@ -132,15 +132,15 @@ class Networks:
                           factory='0xcA143Ce32Fe78f1f7019d7d551a6402fC5350c73',
                           router='0x10ED43C718714eb63d5aA57B78B54704E256024E'))
     Polygon = Network(name='polygon',
-                    rpc='https://polygon-rpc.com/',
-                    coin_symbol='MATIC',
-                    explorer='https://polygonscan.com/',
-                    api=API(key=config.POLYGON_APIKEY,
-                            url='https://api.polygonscan.com/api',
-                            docs='https://docs.polygonscan.com/'),
-                    dex=DEX(name='quickswap',
-                            factory='0x5757371414417b8C6CAad45bAeF941aBc7d3Ab32',
-                            router='0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff'))
+                      rpc='https://polygon-rpc.com/',
+                      coin_symbol='MATIC',
+                      explorer='https://polygonscan.com/',
+                      api=API(key=config.POLYGON_APIKEY,
+                              url='https://api.polygonscan.com/api',
+                              docs='https://docs.polygonscan.com/'),
+                      dex=DEX(name='quickswap',
+                              factory='0x5757371414417b8C6CAad45bAeF941aBc7d3Ab32',
+                              router='0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff'))
     Avalanche = Network(name='avalanche',
                         rpc='https://api.avax.network/ext/bc/C/rpc/',
                         coin_symbol='AVAX',
@@ -162,6 +162,13 @@ class Networks:
                      api=API(key=config.FANTOM_APIKEY,
                              url='https://api.ftmscan.com/api',
                              docs='https://docs.ftmscan.com/'))
+    Celo = Network(name='celo',
+                   rpc='https://rpc.ankr.com/celo/',
+                   coin_symbol='CELO',
+                   explorer='https://celoscan.io/',
+                   api=API(key=config.CELO_APIKEY,
+                           url='https://api.celoscan.io/api',
+                           docs='https://celoscan.io/apis/'))
     Gnosis = Network(name='gnosis',
                      rpc='https://rpc.ankr.com/gnosis/',
                      coin_symbol='xDAI',
