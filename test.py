@@ -398,7 +398,7 @@ Instance from Wei amount: {TokenAmount(amount=500734670000000008192, wei=True)}
 ----------------------------------------------------------------------------''')
 
 
-async def main():
+async def main() -> None:
     print('\n--------- Account ---------')
     account = Account()
     await account.generate_wallets()
