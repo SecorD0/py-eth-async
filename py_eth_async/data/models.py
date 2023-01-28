@@ -131,11 +131,11 @@ class Networks:
                   dex=DEX(name='pancakeswap',
                           factory='0xcA143Ce32Fe78f1f7019d7d551a6402fC5350c73',
                           router='0x10ED43C718714eb63d5aA57B78B54704E256024E'))
-    Matic = Network(name='matic',
+    Polygon = Network(name='polygon',
                     rpc='https://polygon-rpc.com/',
                     coin_symbol='MATIC',
                     explorer='https://polygonscan.com/',
-                    api=API(key=config.MATIC_APIKEY,
+                    api=API(key=config.POLYGON_APIKEY,
                             url='https://api.polygonscan.com/api',
                             docs='https://docs.polygonscan.com/'),
                     dex=DEX(name='quickswap',
