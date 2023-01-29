@@ -33,15 +33,8 @@ class Wallet:
         if not token:
             return Wei(await self.client.w3.eth.get_balance(account=address))
 
-        if isinstance(token, AsyncContract):
-            contract = token
-
-        elif isinstance(token, RawContract):
-            contract = await self.client.contracts.default_token(contract_address=token.address)
-
-        else:
-            contract = await self.client.contracts.default_token(contract_address=token)
-
+        contract_address, abi = await self.client.contracts.get_contract_attributes(token)
+        contract = await self.client.contracts.default_token(contract_address=contract_address)
         return TokenAmount(amount=await contract.functions.balanceOf(address).call(),
                            decimals=await contract.functions.decimals().call(), wei=True)
 
@@ -55,7 +48,7 @@ class Wallet:
         if not address:
             address = self.client.account.address
 
-        elif isinstance(address, AsyncContract) or isinstance(address, RawContract):
-            address = address.address
+        else:
+            address, abi = await self.client.contracts.get_contract_attributes(address)
 
-        return await self.client.w3.eth.get_transaction_count(checksum(address))
+        return await self.client.w3.eth.get_transaction_count(address)

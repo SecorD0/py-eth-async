@@ -224,7 +224,7 @@ class Networks:
                               docs='https://docs.etherscan.io/v/sepolia-etherscan/'))
 
 
-class RawContract:
+class RawContract(AutoRepr):
     def __init__(self, address: str, abi: Union[list, str]) -> None:
         """
         A raw contract instance.

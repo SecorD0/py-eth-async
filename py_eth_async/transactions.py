@@ -308,12 +308,7 @@ class Transactions:
         :param Optional[Address] address: the address to get the transaction list (imported to client address)
         :return Dict[str, CoinTx]: transactions found
         """
-        if isinstance(contract, AsyncContract) or isinstance(contract, RawContract):
-            contract = contract.address
-
-        else:
-            contract = contract
-
+        contract_address, abi = await self.client.contracts.get_contract_attributes(contract)
         if not address:
             address = self.client.account.address
 
@@ -322,7 +317,7 @@ class Transactions:
         for tx in coin_txs:
             if (
                     tx.get('isError') == '0' and
-                    tx.get('to') == contract.lower() and
+                    tx.get('to') == contract_address.lower() and
                     function_name in tx.get('functionName')
             ):
                 txs[tx.get('hash')] = CoinTx(data=tx)
@@ -334,24 +329,14 @@ class Transactions:
         """
         Get approved amount of token.
 
-        :param Contract token: the contract address
-        :param Contract spender: the spender address
+        :param Contract token: the contract address or instance of token
+        :param Contract spender: the spender address, contract address or instance
         :param Optional[Address] owner: the owner address (imported to client address)
         :return Wei: the approved amount
         """
-        if isinstance(token, AsyncContract) or isinstance(token, RawContract):
-            contract_address = token.address
-
-        else:
-            contract_address = token
-
+        contract_address, abi = await self.client.contracts.get_contract_attributes(token)
         contract = await self.client.contracts.default_token(contract_address)
-        if isinstance(spender, AsyncContract) or isinstance(spender, RawContract):
-            spender = spender.address
-
-        else:
-            spender = spender
-
+        spender, abi = await self.client.contracts.get_contract_attributes(spender)
         if not owner:
             owner = self.client.account.address
 
@@ -373,7 +358,7 @@ class Transactions:
         """
         Send a coin or token.
 
-        :param Contract token: the contract address or instance of token to be send, use '' to send the coin
+        :param Contract token: the contract address or instance of token to send, use '' to send the coin
         :param Address recipient: the recipient address
         :param Amount amount: an amount to send (entire balance)
         :param Optional[GasPrice] gas_price: the gas price in GWei (parsed from the network)
@@ -386,14 +371,9 @@ class Transactions:
         if not token:
             contract = None
 
-        elif isinstance(token, AsyncContract):
-            contract = token
-
-        elif isinstance(token, RawContract):
-            contract = await self.client.contracts.default_token(token.address)
-
         else:
-            contract = await self.client.contracts.default_token(token)
+            contract_address, abi = await self.client.contracts.get_contract_attributes(token)
+            contract = await self.client.contracts.default_token(contract_address)
 
         if isinstance(amount, float) or isinstance(amount, int):
             if contract:
@@ -470,8 +450,8 @@ class Transactions:
         """
         Approve token spending for specified address.
 
-        :param Contract token: the contract address or instance of token to be send, use '' to send the coin
-        :param Address spender: the spender address
+        :param Contract token: the contract address or instance of token to approve
+        :param Address spender: the spender address, contract address or instance
         :param Optional[Amount] amount: an amount to approve (infinity)
         :param Optional[GasPrice] gas_price: the gas price in GWei (parsed from the network)
         :param Optional[GasLimit] gas_limit: the gas limit in Wei (parsed from the network)
@@ -479,12 +459,7 @@ class Transactions:
         :param bool check_gas_price: if True and the gas price is higher than that specified in the 'gas_price' argument, the 'GasPriceTooHigh' error will raise (False)
         :return Tx: the instance of the sent transaction
         """
-        if isinstance(token, AsyncContract) or isinstance(token, RawContract):
-            contract_address = token.address
-
-        else:
-            contract_address = token
-
+        contract_address, abi = await self.client.contracts.get_contract_attributes(token)
         contract = await self.client.contracts.default_token(contract_address)
         if not amount:
             amount = CommonValues.InfinityInt
