@@ -173,7 +173,7 @@ class Contracts:
         :return AsyncContract: the contract instance
         """
         contract_address, contract_abi = await self.get_contract_attributes(contract_address)
-        if not contract_abi:
+        if not abi and not contract_abi:
             contract_abi = await self.get_abi(contract_address=contract_address)
 
         if proxy_address:
