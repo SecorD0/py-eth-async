@@ -41,7 +41,7 @@ class Tx(AutoRepr):
         """
         tx_data = await client.w3.eth.get_transaction(transaction_hash=self.hash)
         self.params = {
-            'chainId': await client.w3.eth.chain_id,
+            'chainId': client.network.chain_id,
             'nonce': int(tx_data.get('nonce')),
             'gasPrice': int(tx_data.get('gasPrice')),
             'gas': int(tx_data.get('gas')),
@@ -108,7 +108,7 @@ class Tx(AutoRepr):
                 gas_price = int(self.params.get('gasPrice') * 1.11)
 
             tx_params = {
-                'chainId': await client.w3.eth.chain_id,
+                'chainId': client.network.chain_id,
                 'nonce': self.params.get('nonce'),
                 'gasPrice': gas_price,
                 'to': client.account.address,
@@ -234,7 +234,7 @@ class Transactions:
         :return TxParams: parameters of the transaction with added values
         """
         if 'chainId' not in tx_params:
-            tx_params['chainId'] = await self.client.w3.eth.chain_id
+            tx_params['chainId'] = self.client.network.chain_id
 
         if 'from' not in tx_params:
             tx_params['from'] = self.client.account.address
@@ -492,7 +492,7 @@ class Transactions:
             nonce = await self.client.wallet.nonce()
 
         tx_params = {
-            'chainId': await self.client.w3.eth.chain_id,
+            'chainId': self.client.network.chain_id,
             'nonce': nonce,
             'gasPrice': gas_price.Wei,
             'from': self.client.account.address,

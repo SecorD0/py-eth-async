@@ -44,8 +44,8 @@ class DEX:
 
 
 class Network(AutoRepr):
-    def __init__(self, name: str, rpc: str, coin_symbol: Optional[str] = None, explorer: Optional[str] = None,
-                 api: Optional[API] = None, dex: Optional[DEX] = None) -> None:
+    def __init__(self, name: str, rpc: str, chain_id: Optional[int] = None, coin_symbol: Optional[str] = None,
+                 explorer: Optional[str] = None, api: Optional[API] = None, dex: Optional[DEX] = None) -> None:
         """
         A Network instance to use it in the Client.
 
@@ -58,16 +58,23 @@ class Network(AutoRepr):
         """
         self.name: str = name.lower()
         self.rpc: str = rpc
-        self.coin_symbol: str = coin_symbol
+        self.chain_id: Optional[int] = chain_id
+        self.coin_symbol: Optional[str] = coin_symbol
         self.explorer: Optional[str] = explorer
         self.api: Optional[API] = api
         self.dex: Optional[DEX] = dex
 
+        if not self.chain_id:
+            try:
+                self.chain_id = Web3(Web3.HTTPProvider(self.rpc)).eth.chain_id
+
+            except:
+                pass
+
         if not self.coin_symbol:
             try:
-                chain_id = Web3(Web3.HTTPProvider(self.rpc)).eth.chain_id
                 response = requests.get('https://chainid.network/chains.json').json()
-                network = next((network for network in response if network['chainId'] == chain_id), None)
+                network = next((network for network in response if network['chainId'] == self.chain_id), None)
                 self.coin_symbol = network['nativeCurrency']['symbol']
 
             except:
@@ -87,6 +94,7 @@ class Networks:
     # Mainnets
     Ethereum = Network(name='ethereum',
                        rpc='https://rpc.ankr.com/eth/',
+                       chain_id=1,
                        coin_symbol='ETH',
                        explorer='https://etherscan.io/',
                        api=API(key=config.ETHEREUM_APIKEY,
@@ -97,6 +105,7 @@ class Networks:
                                router='0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D'))
     Arbitrum = Network(name='arbitrum',
                        rpc='https://arb1.arbitrum.io/rpc/',
+                       chain_id=42161,
                        coin_symbol='ETH',
                        explorer='https://arbiscan.io/',
                        api=API(key=config.ARBITRUM_APIKEY,
@@ -107,6 +116,7 @@ class Networks:
                                router='0xE592427A0AEce92De3Edee1F18E0157C05861564'))
     ArbitrumNova = Network(name='arbitrum_nova',
                            rpc='https://nova.arbitrum.io/rpc/',
+                           chain_id=42170,
                            coin_symbol='ETH',
                            explorer='https://nova.arbiscan.io/',
                            api=API(key=config.ARBITRUM_APIKEY,
@@ -114,6 +124,7 @@ class Networks:
                                    docs='https://nova.arbiscan.io/apis/'))
     Optimism = Network(name='optimism',
                        rpc='https://rpc.ankr.com/optimism/',
+                       chain_id=10,
                        coin_symbol='ETH',
                        explorer='https://optimistic.etherscan.io/',
                        api=API(key=config.OPTIMISM_APIKEY,
@@ -123,6 +134,7 @@ class Networks:
                                router='0xE592427A0AEce92De3Edee1F18E0157C05861564'))
     BSC = Network(name='bsc',
                   rpc='https://bsc-dataseed.binance.org/',
+                  chain_id=56,
                   coin_symbol='BNB',
                   explorer='https://bscscan.com/',
                   api=API(key=config.BSC_APIKEY,
@@ -133,6 +145,7 @@ class Networks:
                           router='0x10ED43C718714eb63d5aA57B78B54704E256024E'))
     Polygon = Network(name='polygon',
                       rpc='https://polygon-rpc.com/',
+                      chain_id=137,
                       coin_symbol='MATIC',
                       explorer='https://polygonscan.com/',
                       api=API(key=config.POLYGON_APIKEY,
@@ -143,6 +156,7 @@ class Networks:
                               router='0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff'))
     Avalanche = Network(name='avalanche',
                         rpc='https://api.avax.network/ext/bc/C/rpc/',
+                        chain_id=43114,
                         coin_symbol='AVAX',
                         explorer='https://snowtrace.io/',
                         api=API(key=config.AVALANCHE_APIKEY,
@@ -150,6 +164,7 @@ class Networks:
                                 docs='https://docs.snowtrace.io/'))
     Moonbeam = Network(name='moonbeam',
                        rpc='https://rpc.api.moonbeam.network/',
+                       chain_id=1284,
                        coin_symbol='GLMR',
                        explorer='https://moonscan.io/',
                        api=API(key=config.MOONBEAM_APIKEY,
@@ -157,6 +172,7 @@ class Networks:
                                docs='https://moonscan.io/apis/'))
     Fantom = Network(name='fantom',
                      rpc='https://rpc.ankr.com/fantom/',
+                     chain_id=250,
                      coin_symbol='FTM',
                      explorer='https://ftmscan.com/',
                      api=API(key=config.FANTOM_APIKEY,
@@ -164,6 +180,7 @@ class Networks:
                              docs='https://docs.ftmscan.com/'))
     Celo = Network(name='celo',
                    rpc='https://rpc.ankr.com/celo/',
+                   chain_id=42220,
                    coin_symbol='CELO',
                    explorer='https://celoscan.io/',
                    api=API(key=config.CELO_APIKEY,
@@ -171,6 +188,7 @@ class Networks:
                            docs='https://celoscan.io/apis/'))
     Gnosis = Network(name='gnosis',
                      rpc='https://rpc.ankr.com/gnosis/',
+                     chain_id=100,
                      coin_symbol='xDAI',
                      explorer='https://gnosisscan.io/',
                      api=API(key=config.GNOSIS_APIKEY,
@@ -178,6 +196,7 @@ class Networks:
                              docs='https://docs.gnosisscan.io/'))
     HECO = Network(name='heco',
                    rpc='https://http-mainnet.hecochain.com/',
+                   chain_id=128,
                    coin_symbol='HT',
                    explorer='https://hecoinfo.com/',
                    api=API(key=config.HECO_APIKEY,
@@ -187,6 +206,7 @@ class Networks:
     # Testnets
     Goerli = Network(name='goerli',
                      rpc='https://rpc.ankr.com/eth_goerli/',
+                     chain_id=5,
                      coin_symbol='ETH',
                      explorer='https://goerli.etherscan.io/',
                      api=API(key=config.GOERLI_APIKEY,
@@ -195,6 +215,7 @@ class Networks:
 
     Sepolia = Network(name='sepolia',
                       rpc='https://rpc.ankr.com/eth_sepolia/',
+                      chain_id=11155111,
                       coin_symbol='ETH',
                       explorer='https://sepolia.etherscan.io/',
                       api=API(key=config.SEPOLIA_APIKEY,
