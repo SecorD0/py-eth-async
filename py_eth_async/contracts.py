@@ -174,23 +174,29 @@ class Contracts:
         :return AsyncContract: the contract instance
         """
         if isinstance(contract_address, AsyncContract) or isinstance(contract_address, RawContract):
+            contract_abi = contract_address.abi
             contract_address = contract_address.address
 
         else:
             contract_address = checksum(contract_address)
+            contract_abi = await self.get_abi(contract_address=contract_address)
 
-        if not abi:
-            if proxy_address:
-                if isinstance(proxy_address, AsyncContract) or isinstance(proxy_address, RawContract):
-                    abi_contract = proxy_address.address
-
-                else:
-                    abi_contract = checksum(proxy_address)
+        if proxy_address:
+            if isinstance(proxy_address, AsyncContract) or isinstance(proxy_address, RawContract):
+                proxy_abi = proxy_address.abi
+                proxy_address = proxy_address.address
 
             else:
-                abi_contract = contract_address
+                proxy_abi = None
+                proxy_address = checksum(proxy_address)
 
-            abi = await self.get_abi(contract_address=abi_contract)
+            if not proxy_abi:
+                proxy_abi = await self.get_abi(contract_address=proxy_address)
+
+            contract_abi = proxy_abi
+
+        if not abi:
+            abi = contract_abi
 
         if abi:
             return self.client.w3.eth.contract(address=contract_address, abi=abi)
