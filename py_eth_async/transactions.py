@@ -4,10 +4,12 @@ from eth_account.datastructures import SignedTransaction
 from hexbytes import HexBytes
 from pretty_utils.type_functions.classes import AutoRepr
 from web3.contract import AsyncContract
-from web3.types import TxReceipt, _Hash32, TxParams, Address, ChecksumAddress, ENS
+from web3.types import TxReceipt, _Hash32, TxParams, Address
 
 from py_eth_async import exceptions
-from py_eth_async.data.models import TxHistory, RawTxHistory, GWei, Wei, Ether, TokenAmount, CommonValues, CoinTx
+from py_eth_async.data import types
+from py_eth_async.data.models import (TxHistory, RawTxHistory, GWei, Wei, Ether, TokenAmount, CommonValues, CoinTx,
+                                      RawContract)
 from py_eth_async.data.types import Web3Async
 from py_eth_async.utils import api_key_required, checksum
 
@@ -87,14 +89,14 @@ class Tx(AutoRepr):
                                                                              timeout=timeout))
         return self.receipt
 
-    async def cancel(self, client, gas_price: Optional[Union[float, int, Wei, GWei]] = None,
-                     gas_limit: Optional[Union[int, Wei]] = None) -> bool:
+    async def cancel(self, client, gas_price: Optional[types.GasPrice] = None,
+                     gas_limit: Optional[types.GasLimit] = None) -> bool:
         """
         Cancel the transaction.
 
         :param Client client: the Client instance
-        :param Optional[Union[float, int, Wei, GWei]] gas_price: the gas price in GWei (parsed from the network)
-        :param Optional[Union[int, Wei]] gas_limit: the gas limit in Wei (parsed from the network)
+        :param Optional[GasPrice] gas_price: the gas price in GWei (parsed from the network)
+        :param Optional[GasLimit] gas_limit: the gas limit in Wei (parsed from the network)
         :return bool: True if the transaction was sent successfully
         """
         if self.params and 'nonce' in self.params:
@@ -131,14 +133,14 @@ class Tx(AutoRepr):
 
         return False
 
-    async def speed_up(self, client, gas_price: Optional[Union[float, int, Wei, GWei]] = None,
-                       gas_limit: Optional[Union[int, Wei]] = None) -> bool:
+    async def speed_up(self, client, gas_price: Optional[types.GasPrice] = None,
+                       gas_limit: Optional[types.GasLimit] = None) -> bool:
         """
         Speed up the transaction.
 
         :param Client client: the Client instance
-        :param Optional[Union[float, int, Wei, GWei]] gas_price: the gas price in GWei (parsed from the network * 1.5)
-        :param Optional[Union[int, Wei]] gas_limit: the gas limit in Wei (parsed from the network)
+        :param Optional[GasPrice] gas_price: the gas price in GWei (parsed from the network * 1.5)
+        :param Optional[GasLimit] gas_limit: the gas limit in Wei (parsed from the network)
         :return bool: True if the transaction was sent successfully
         """
         if self.params and 'nonce' in self.params:
@@ -199,14 +201,13 @@ class Transactions:
         return Wei(await w3.eth.estimate_gas(transaction=tx_params))
 
     @staticmethod
-    async def decode_input_data(client, contract: Union[str, Address, ChecksumAddress, ENS, AsyncContract],
-                                input_data: Optional[str] = None,
+    async def decode_input_data(client, contract: types.Contract, input_data: Optional[str] = None,
                                 tx_hash: Optional[_Hash32] = None) -> Tuple[str, Dict[str, Any]]:
         """
         Decode the input data of a sent transaction.
 
         :param Client client: the Client instance
-        :param Union[str, Address, ChecksumAddress, ENS, AsyncContract] contract: the contract address or instance whose ABI will be used to decode input data
+        :param Contract contract: the contract address or instance whose ABI will be used to decode input data
         :param Optional[str] input_data: the raw input data (None)
         :param Optional[_Hash32] tx_hash: the transaction hash to parse input data (None)
         :return Tuple[str, Dict[str, Any]]: the function identifier and decoded input data of a sent transaction
@@ -214,7 +215,10 @@ class Transactions:
         if not input_data and not tx_hash:
             raise exceptions.TransactionException("Specify 'input_data' or 'tx_hash' argument values!")
 
-        if not isinstance(contract, AsyncContract):
+        if isinstance(contract, RawContract):
+            contract = await client.contracts.get(contract.address)
+
+        elif not isinstance(contract, AsyncContract):
             contract = await client.contracts.get(contract)
 
         if input_data:
@@ -294,18 +298,22 @@ class Transactions:
                          erc721_txs=erc721_txs)
 
     @api_key_required
-    async def find_txs(self, contract: Union[str, Address, ChecksumAddress, ENS, AsyncContract],
-                       function_name: Optional[str] = '',
-                       address: Optional[Union[str, Address, ChecksumAddress, ENS]] = None) -> Dict[str, CoinTx]:
+    async def find_txs(self, contract: types.Contract, function_name: Optional[str] = '',
+                       address: Optional[types.Address] = None) -> Dict[str, CoinTx]:
         """
         Find all transactions of interaction with the contract, in addition, you can filter transactions by the name of the contract function.
 
-        :param Union[str, Address, ChecksumAddress, ENS, AsyncContract] contract: the contract address or instance with which the interaction took place
+        :param Contract contract: the contract address or instance with which the interaction took place
         :param Optional[str] function_name: the function name for sorting (any)
-        :param Optional[Union[str, Address, ChecksumAddress, ENS]] address: the address to get the transaction list (imported to client address)
+        :param Optional[Address] address: the address to get the transaction list (imported to client address)
         :return Dict[str, CoinTx]: transactions found
         """
-        contract = contract.address if isinstance(contract, AsyncContract) else contract
+        if isinstance(contract, AsyncContract) or isinstance(contract, RawContract):
+            contract = contract.address
+
+        else:
+            contract = contract
+
         if not address:
             address = self.client.account.address
 
@@ -321,19 +329,29 @@ class Transactions:
 
         return txs
 
-    async def approved_amount(self, token: Union[str, Address, ChecksumAddress, ENS, AsyncContract],
-                              spender: Union[str, Address, ChecksumAddress, ENS, AsyncContract],
-                              owner: Union[str, Address, ChecksumAddress, ENS] = None) -> Wei:
+    async def approved_amount(self, token: types.Contract, spender: types.Contract,
+                              owner: Optional[types.Address] = None) -> Wei:
         """
         Get approved amount of token.
 
-        :param Union[str, Address, ChecksumAddress, ENS, AsyncContract] token: the contract address
-        :param Union[str, Address, ChecksumAddress, ENS, AsyncContract] spender: the spender address
-        :param Union[str, Address, ChecksumAddress, ENS] owner: the owner address (imported to client address)
+        :param Contract token: the contract address
+        :param Contract spender: the spender address
+        :param Optional[Address] owner: the owner address (imported to client address)
         :return Wei: the approved amount
         """
-        contract_address = token.address if isinstance(token, AsyncContract) else token
+        if isinstance(token, AsyncContract) or isinstance(token, RawContract):
+            contract_address = token.address
+
+        else:
+            contract_address = token
+
         contract = await self.client.contracts.default_token(contract_address)
+        if isinstance(spender, AsyncContract) or isinstance(spender, RawContract):
+            spender = spender.address
+
+        else:
+            spender = spender
+
         if not owner:
             owner = self.client.account.address
 
@@ -349,20 +367,17 @@ class Transactions:
         """
         return dict(await self.client.w3.eth.wait_for_transaction_receipt(transaction_hash=tx_hash, timeout=timeout))
 
-    async def send(self, token: Union[str, Address, ChecksumAddress, ENS, AsyncContract],
-                   recipient: Union[str, Address, ChecksumAddress, ENS],
-                   amount: Union[float, int, TokenAmount, Ether, Wei] = 999_999_999_999_999,
-                   gas_price: Optional[Union[float, int, Wei, GWei]] = None,
-                   gas_limit: Optional[Union[int, Wei]] = None,
+    async def send(self, token: types.Contract, recipient: types.Address, amount: types.Amount = 999_999_999_999_999,
+                   gas_price: Optional[types.GasPrice] = None, gas_limit: Optional[types.GasLimit] = None,
                    nonce: Optional[int] = None, check_gas_price: bool = False, dry_run: bool = False) -> Tx:
         """
         Send a coin or token.
 
-        :param Union[str, Address, ChecksumAddress, ENS, AsyncContract] token: the contract address or instance of token to be send, use '' to send the coin
-        :param Union[str, Address, ChecksumAddress, ENS] recipient: the recipient address
-        :param Union[float, int, TokenAmount, Ether, Wei] amount: an amount to send (entire balance)
-        :param Optional[Union[float, int, Wei, GWei]] gas_price: the gas price in GWei (parsed from the network)
-        :param Optional[Union[int, Wei]] gas_limit: the gas limit in Wei (parsed from the network)
+        :param Contract token: the contract address or instance of token to be send, use '' to send the coin
+        :param Address recipient: the recipient address
+        :param Amount amount: an amount to send (entire balance)
+        :param Optional[GasPrice] gas_price: the gas price in GWei (parsed from the network)
+        :param Optional[GasLimit] gas_limit: the gas limit in Wei (parsed from the network)
         :param Optional[int] nonce: a nonce of the sender address (get it using the 'nonce' function)
         :param bool check_gas_price: if True and the gas price is higher than that specified in the 'gas_price' argument, the 'GasPriceTooHigh' error will raise (False)
         :param bool dry_run: if True, it creates a parameter dictionary, but doesn't send the transaction (False)
@@ -373,6 +388,9 @@ class Transactions:
 
         elif isinstance(token, AsyncContract):
             contract = token
+
+        elif isinstance(token, RawContract):
+            contract = await self.client.contracts.default_token(token.address)
 
         else:
             contract = await self.client.contracts.default_token(token)
@@ -446,25 +464,27 @@ class Transactions:
 
         return await self.sign_and_send(tx_params=tx_params)
 
-    async def approve(self, token: Union[str, Address, ChecksumAddress, ENS, AsyncContract],
-                      spender: Union[str, Address, ChecksumAddress, ENS],
-                      amount: Union[float, int, TokenAmount, Ether, Wei] = None,
-                      gas_price: Optional[Union[float, int, Wei, GWei]] = None,
-                      gas_limit: Optional[Union[int, Wei]] = None,
+    async def approve(self, token: types.Contract, spender: types.Address, amount: Optional[types.Amount] = None,
+                      gas_price: Optional[types.GasPrice] = None, gas_limit: Optional[types.GasLimit] = None,
                       nonce: Optional[int] = None, check_gas_price: bool = False) -> Tx:
         """
         Approve token spending for specified address.
 
-        :param Union[str, Address, ChecksumAddress, ENS, AsyncContract] token: the contract address or instance of token to be send, use '' to send the coin
-        :param Union[str, Address, ChecksumAddress, ENS] spender: the spender address
-        :param Union[float, int, TokenAmount, Ether, Wei] amount: an amount to approve (infinity)
-        :param Optional[Union[float, int, Wei, GWei]] gas_price: the gas price in GWei (parsed from the network)
-        :param Optional[Union[int, Wei]] gas_limit: the gas limit in Wei (parsed from the network)
+        :param Contract token: the contract address or instance of token to be send, use '' to send the coin
+        :param Address spender: the spender address
+        :param Optional[Amount] amount: an amount to approve (infinity)
+        :param Optional[GasPrice] gas_price: the gas price in GWei (parsed from the network)
+        :param Optional[GasLimit] gas_limit: the gas limit in Wei (parsed from the network)
         :param Optional[int] nonce: a nonce of the sender address (get it using the 'nonce' function)
         :param bool check_gas_price: if True and the gas price is higher than that specified in the 'gas_price' argument, the 'GasPriceTooHigh' error will raise (False)
         :return Tx: the instance of the sent transaction
         """
-        contract_address = token.address if isinstance(token, AsyncContract) else token
+        if isinstance(token, AsyncContract) or isinstance(token, RawContract):
+            contract_address = token.address
+
+        else:
+            contract_address = token
+
         contract = await self.client.contracts.default_token(contract_address)
         if not amount:
             amount = CommonValues.InfinityInt

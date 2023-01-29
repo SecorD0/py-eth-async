@@ -2,13 +2,12 @@ import asyncio
 import json
 from typing import Union, Optional, List, Dict, Any
 
-from eth_typing import ChecksumAddress, Address
 from evmdasm import EvmBytecode
 from pretty_utils.type_functions.strings import text_between
 from web3.contract import AsyncContract
-from web3.types import ENS
 
-from py_eth_async.data.models import DefaultABIs, ABI, Function
+from py_eth_async.data import types
+from py_eth_async.data.models import DefaultABIs, ABI, Function, RawContract
 from py_eth_async.utils import checksum, async_get
 
 
@@ -74,17 +73,21 @@ class Contracts:
 
         return function
 
-    async def get_abi(self, contract_address: Union[str, Address, ChecksumAddress, ENS, AsyncContract],
+    async def get_abi(self, contract_address: types.Contract,
                       raw_json: bool = False) -> Union[str, List[Dict[str, Any]]]:
         """
         Get a contract ABI from the Etherscan API, if unsuccessful, parses it based on the contract source code (it may be incorrect or incomplete).
 
-        :param Union[str, Address, ChecksumAddress, ENS, AsyncContract] contract_address: the contract address
+        :param Contract contract_address: the contract address
         :param bool raw_json: if True, it returns serialize string, otherwise it returns Python list (False)
         :return Union[str, List[Dict[str, Any]]]: the ABI
         """
-        contract_address = checksum(contract_address.address if isinstance(contract_address,
-                                                                           AsyncContract) else contract_address)
+        if isinstance(contract_address, AsyncContract) or isinstance(contract_address, RawContract):
+            contract_address = contract_address.address
+
+        else:
+            contract_address = checksum(contract_address)
+
         abi = []
         if self.client.network.api.key:
             try:
@@ -130,48 +133,59 @@ class Contracts:
 
         return abi
 
-    async def default_token(self, contract_address: Union[str, Address, ChecksumAddress, ENS,
-                                                          AsyncContract]) -> AsyncContract:
+    async def default_token(self, contract_address: types.Contract) -> AsyncContract:
         """
         Get a token contract instance with a standard set of functions.
 
-        :param Union[str, Address, ChecksumAddress, ENS, AsyncContract] contract_address: the contract address
+        :param Contract contract_address: the contract address
         :return AsyncContract: the token contract instance
         """
-        contract_address = checksum(contract_address.address if isinstance(contract_address,
-                                                                           AsyncContract) else contract_address)
+        if isinstance(contract_address, AsyncContract) or isinstance(contract_address, RawContract):
+            contract_address = contract_address.address
+
+        else:
+            contract_address = checksum(contract_address)
+
         return self.client.w3.eth.contract(address=contract_address, abi=DefaultABIs.Token)
 
-    async def default_nft(self, contract_address: Union[str, Address, ChecksumAddress, ENS,
-                                                        AsyncContract]) -> AsyncContract:
+    async def default_nft(self, contract_address: types.Contract) -> AsyncContract:
         """
         Get a NFT contract instance with a standard set of functions.
 
-        :param Union[str, Address, ChecksumAddress, ENS, AsyncContract] contract_address: the contract address
+        :param Contract contract_address: the contract address
         :return AsyncContract: the NFT contract instance
         """
-        contract_address = checksum(contract_address.address if isinstance(contract_address,
-                                                                           AsyncContract) else contract_address)
+        if isinstance(contract_address, AsyncContract) or isinstance(contract_address, RawContract):
+            contract_address = contract_address.address
+
+        else:
+            contract_address = checksum(contract_address)
+
         return self.client.w3.eth.contract(address=contract_address, abi=DefaultABIs.NFT)
 
-    async def get(self, contract_address: Union[str, Address, ChecksumAddress, ENS, AsyncContract],
-                  abi: Optional[Union[list, str]] = None,
-                  proxy_address: Optional[Union[str, Address, ChecksumAddress, ENS,
-                                                AsyncContract]] = None) -> AsyncContract:
+    async def get(self, contract_address: types.Contract, abi: Optional[Union[list, str]] = None,
+                  proxy_address: Optional[types.Contract] = None) -> AsyncContract:
         """
         Get a contract instance.
 
-        :param Union[str, Address, ChecksumAddress, ENS, AsyncContract] contract_address: the contract address
+        :param Contract contract_address: the contract address
         :param Optional[Union[list, str]] abi: the contract ABI (get it using the 'get_abi' function)
-        :param Optional[Union[str, Address, ChecksumAddress, ENS, AsyncContract]] proxy_address: the contract proxy address (None)
+        :param Optional[Contract] proxy_address: the contract proxy address (None)
         :return AsyncContract: the contract instance
         """
-        contract_address = checksum(contract_address.address if isinstance(contract_address,
-                                                                           AsyncContract) else contract_address)
+        if isinstance(contract_address, AsyncContract) or isinstance(contract_address, RawContract):
+            contract_address = contract_address.address
+
+        else:
+            contract_address = checksum(contract_address)
+
         if not abi:
             if proxy_address:
-                abi_contract = checksum(proxy_address.address if isinstance(proxy_address,
-                                                                            AsyncContract) else proxy_address)
+                if isinstance(proxy_address, AsyncContract) or isinstance(proxy_address, RawContract):
+                    abi_contract = proxy_address.address
+
+                else:
+                    abi_contract = checksum(proxy_address)
 
             else:
                 abi_contract = contract_address
@@ -183,14 +197,18 @@ class Contracts:
 
         return self.client.w3.eth.contract(address=contract_address)
 
-    async def get_functions(self, contract: Union[str, Address, ChecksumAddress, ENS, AsyncContract]) -> List[Function]:
+    async def get_functions(self, contract: types.Contract) -> List[Function]:
         """
         Get functions of a contract in human-readable form.
 
-        :param Union[str, Address, ChecksumAddress, ENS, AsyncContract] contract: the contract address or instance
+        :param Contract contract: the contract address or instance
         :return List[Function]: functions of the contract
         """
-        contract = contract if isinstance(contract, AsyncContract) else await self.get(
-            contract_address=checksum(contract))
+        if isinstance(contract, RawContract):
+            contract = await self.get(contract_address=contract.address)
+
+        elif not isinstance(contract, AsyncContract):
+            contract = await self.get(contract_address=checksum(contract))
+
         abi = contract.abi or []
         return ABI(abi=abi).functions

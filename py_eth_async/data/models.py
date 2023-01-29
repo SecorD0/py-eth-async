@@ -4,6 +4,7 @@ from decimal import Decimal
 from typing import Optional, Union, Dict, List, Any
 
 import requests
+from eth_typing import ChecksumAddress
 from eth_utils import to_wei, from_wei
 from pretty_utils.type_functions.classes import AutoRepr
 from web3 import Web3
@@ -223,6 +224,21 @@ class Networks:
                               docs='https://docs.etherscan.io/v/sepolia-etherscan/'))
 
 
+class RawContract:
+    def __init__(self, address: str, abi: Union[list, str]) -> None:
+        """
+        A raw contract instance.
+
+        :param str address: a contract address
+        :param abi: an ABI of the contract
+        """
+        if isinstance(abi, str):
+            abi = json.loads(abi)
+
+        self.address: ChecksumAddress = checksum(address)
+        self.abi: list = abi
+
+
 @dataclass
 class CommonValues:
     """
@@ -375,7 +391,7 @@ class Function:
 
 
 class ABI(AutoRepr):
-    def __init__(self, abi: Union[str, list]) -> None:
+    def __init__(self, abi: Union[list, str]) -> None:
         """
         An ABI instance.
 

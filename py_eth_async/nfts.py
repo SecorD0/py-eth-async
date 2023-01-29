@@ -2,12 +2,11 @@ import json
 from typing import Union
 from urllib.request import urlopen
 
-from eth_typing import Address, ChecksumAddress
 from web3.contract import AsyncContract
-from web3.types import ENS
 
 from py_eth_async import exceptions
-from py_eth_async.data.models import NFT
+from py_eth_async.data import types
+from py_eth_async.data.models import NFT, RawContract
 from py_eth_async.utils import async_get
 
 
@@ -20,16 +19,20 @@ class NFTs:
         """
         self.client = client
 
-    async def get_info(self, contract: Union[str, Address, ChecksumAddress, ENS, AsyncContract],
-                       token_id: Union[int, str] = None) -> NFT:
+    async def get_info(self, contract: types.Contract, token_id: Union[int, str] = None) -> NFT:
         """
         Get information about a NFT.
 
-        :param Union[str, Address, ChecksumAddress, ENS, AsyncContract] contract: the contract address or instance of a NFT collection
+        :param Contract contract: the contract address or instance of a NFT collection
         :param Union[int, str] token_id: the NFT ID to parse the owner and attributes (None)
         :return NFT: the NFT
         """
-        contract_address = contract.address if isinstance(contract, AsyncContract) else contract
+        if isinstance(contract, AsyncContract) or isinstance(contract, RawContract):
+            contract_address = contract.address
+
+        else:
+            contract_address = contract
+
         contract = await self.client.contracts.default_nft(contract_address)
         nft = NFT(contract_address=contract_address)
         nft.name = await contract.functions.name().call()

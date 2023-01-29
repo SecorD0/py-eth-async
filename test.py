@@ -25,7 +25,7 @@ class Account:
         """Show balance in coin."""
         client = Client(private_key=private_key)
         address = '0xf5de760f2e916647fd766B4AD9E85ff943cE3A2b'
-        coin_symbol = await get_coin_symbol(chain_id=await client.network.chain_id)
+        coin_symbol = await get_coin_symbol(chain_id=client.network.chain_id)
         print(f'''Your ({client.account.address}) balance: {(await client.wallet.balance()).Ether} {coin_symbol}
 {address} balance: {(await client.wallet.balance(address=address)).Ether} {coin_symbol}
 ----------------------------------------------------------------------------''')
@@ -263,7 +263,7 @@ Raw tx:
 {tx}
 Receipt:
 {dict(receipt)}
-Balance after sending: {(await client.wallet.balance()).Ether} {await get_coin_symbol(chain_id=await client.network.chain_id)}
+Balance after sending: {(await client.wallet.balance()).Ether} {await get_coin_symbol(chain_id=client.network.chain_id)}
 ----------------------------------------------------------------------------''')
 
     @staticmethod
@@ -304,7 +304,7 @@ Receipt:
 {tx}
 Receipt:
 {dict(receipt)}
-Balance after sending: {(await client.wallet.balance()).Ether} {await get_coin_symbol(chain_id=await client.network.chain_id)}
+Balance after sending: {(await client.wallet.balance()).Ether} {await get_coin_symbol(chain_id=client.network.chain_id)}
 ----------------------------------------------------------------------------''')
 
     @staticmethod
@@ -337,7 +337,7 @@ Balance after sending: {(await client.wallet.balance(token=token)).Ether}
 {tx}
 Receipt:
 {dict(receipt)}
-Balance after sending: {(await client.wallet.balance()).Ether} {await get_coin_symbol(chain_id=await client.network.chain_id)}
+Balance after sending: {(await client.wallet.balance()).Ether} {await get_coin_symbol(chain_id=client.network.chain_id)}
 ----------------------------------------------------------------------------''')
 
     @staticmethod
