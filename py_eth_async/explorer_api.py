@@ -3,7 +3,7 @@ from typing import Optional, Union, List, Dict, Any
 from fake_useragent import UserAgent
 
 from py_eth_async import exceptions
-from py_eth_async.utils import async_get
+from py_eth_async.utils import async_get, aiohttp_params
 
 
 class Tag:
@@ -78,7 +78,7 @@ class Account:
             'address': address,
             'tag': tag
         }
-        return await async_get(self.url, params=params, headers={'User-Agent': UserAgent().chrome})
+        return await async_get(self.url, params=aiohttp_params(params), headers={'User-Agent': UserAgent().chrome})
 
     async def balancemulti(self, addresses: List[str], tag: Union[str, Tag] = Tag.Latest) -> Dict[str, Any]:
         """
@@ -101,7 +101,7 @@ class Account:
             'address': addresses,
             'tag': tag
         }
-        return await async_get(self.url, params=params, headers={'User-Agent': UserAgent().chrome})
+        return await async_get(self.url, params=aiohttp_params(params), headers={'User-Agent': UserAgent().chrome})
 
     async def txlist(self, address: str, startblock: Optional[int] = None, endblock: Optional[int] = None,
                      page: Optional[int] = None, offset: Optional[int] = None,
@@ -128,21 +128,14 @@ class Account:
             'action': action,
             'apikey': self.key,
             'address': address,
-            'sort': sort
+            'sort': sort,
+            'startblock': startblock,
+            'endblock': endblock,
+            'page': page,
+            'offset': offset
         }
-        if startblock:
-            params['startblock'] = startblock
 
-        if endblock:
-            params['endblock'] = endblock
-
-        if page:
-            params['page'] = page
-
-        if offset:
-            params['offset'] = offset
-
-        return await async_get(self.url, params=params, headers={'User-Agent': UserAgent().chrome})
+        return await async_get(self.url, params=aiohttp_params(params), headers={'User-Agent': UserAgent().chrome})
 
     async def txlistinternal(self, address: Optional[str] = None, txhash: Optional[str] = None,
                              startblock: Optional[int] = None, endblock: Optional[int] = None,
@@ -176,40 +169,24 @@ class Account:
             if not startblock and endblock:
                 raise exceptions.APIException('Specify "startblock" an "endblock" parameters')
 
+            params['startblock'] = startblock
+            params['endblock'] = endblock
             params['sort'] = sort
-            if startblock:
-                params['startblock'] = startblock
-
-            if endblock:
-                params['endblock'] = endblock
-
-            if page:
-                params['page'] = page
-
-            if offset:
-                params['offset'] = offset
+            params['page'] = page
+            params['offset'] = offset
 
         elif txhash:
             params['txhash'] = txhash
 
         else:
+            params['address'] = address
             params['sort'] = sort
-            if address:
-                params['address'] = address
+            params['startblock'] = startblock
+            params['endblock'] = endblock
+            params['page'] = page
+            params['offset'] = offset
 
-            if startblock:
-                params['startblock'] = startblock
-
-            if endblock:
-                params['endblock'] = endblock
-
-            if page:
-                params['page'] = page
-
-            if offset:
-                params['offset'] = offset
-
-        return await async_get(self.url, params=params, headers={'User-Agent': UserAgent().chrome})
+        return await async_get(self.url, params=aiohttp_params(params), headers={'User-Agent': UserAgent().chrome})
 
     async def tokentx(self, address: str, contractaddress: Optional[str] = None, startblock: Optional[int] = None,
                       endblock: Optional[int] = None, page: Optional[int] = None, offset: Optional[int] = None,
@@ -237,25 +214,14 @@ class Account:
             'action': action,
             'apikey': self.key,
             'address': address,
-            'sort': sort
+            'sort': sort,
+            'contractaddress': contractaddress,
+            'startblock': startblock,
+            'endblock': endblock,
+            'page': page,
+            'offset': offset
         }
-
-        if contractaddress:
-            params['contractaddress'] = contractaddress
-
-        if startblock:
-            params['startblock'] = startblock
-
-        if endblock:
-            params['endblock'] = endblock
-
-        if page:
-            params['page'] = page
-
-        if offset:
-            params['offset'] = offset
-
-        return await async_get(self.url, params=params, headers={'User-Agent': UserAgent().chrome})
+        return await async_get(self.url, params=aiohttp_params(params), headers={'User-Agent': UserAgent().chrome})
 
     async def tokennfttx(self, address: str, contractaddress: Optional[str] = None, startblock: Optional[int] = None,
                          endblock: Optional[int] = None, page: Optional[int] = None, offset: Optional[int] = None,
@@ -283,25 +249,14 @@ class Account:
             'action': action,
             'apikey': self.key,
             'address': address,
-            'sort': sort
+            'sort': sort,
+            'contractaddress': contractaddress,
+            'startblock': startblock,
+            'endblock': endblock,
+            'page': page,
+            'offset': offset
         }
-
-        if contractaddress:
-            params['contractaddress'] = contractaddress
-
-        if startblock:
-            params['startblock'] = startblock
-
-        if endblock:
-            params['endblock'] = endblock
-
-        if page:
-            params['page'] = page
-
-        if offset:
-            params['offset'] = offset
-
-        return await async_get(self.url, params=params, headers={'User-Agent': UserAgent().chrome})
+        return await async_get(self.url, params=aiohttp_params(params), headers={'User-Agent': UserAgent().chrome})
 
     async def token1155tx(self, address: str, contractaddress: Optional[str] = None, startblock: Optional[int] = None,
                           endblock: Optional[int] = None, page: Optional[int] = None, offset: Optional[int] = None,
@@ -329,25 +284,14 @@ class Account:
             'action': action,
             'apikey': self.key,
             'address': address,
-            'sort': sort
+            'sort': sort,
+            'contractaddress': contractaddress,
+            'startblock': startblock,
+            'endblock': endblock,
+            'page': page,
+            'offset': offset
         }
-
-        if contractaddress:
-            params['contractaddress'] = contractaddress
-
-        if startblock:
-            params['startblock'] = startblock
-
-        if endblock:
-            params['endblock'] = endblock
-
-        if page:
-            params['page'] = page
-
-        if offset:
-            params['offset'] = offset
-
-        return await async_get(self.url, params=params, headers={'User-Agent': UserAgent().chrome})
+        return await async_get(self.url, params=aiohttp_params(params), headers={'User-Agent': UserAgent().chrome})
 
     async def getminedblocks(self, address: str, blocktype: Union[str, BlockType] = BlockType.Blocks,
                              page: Optional[int] = None, offset: Optional[int] = None) -> Dict[str, Any]:
@@ -371,16 +315,11 @@ class Account:
             'action': action,
             'apikey': self.key,
             'address': address,
-            'blocktype': blocktype
+            'blocktype': blocktype,
+            'page': page,
+            'offset': offset
         }
-
-        if page:
-            params['page'] = page
-
-        if offset:
-            params['offset'] = offset
-
-        return await async_get(self.url, params=params, headers={'User-Agent': UserAgent().chrome})
+        return await async_get(self.url, params=aiohttp_params(params), headers={'User-Agent': UserAgent().chrome})
 
     async def balancehistory(self, address: str, blockno: int) -> Dict[str, Any]:
         """
@@ -400,7 +339,7 @@ class Account:
             'address': address,
             'blockno': blockno
         }
-        return await async_get(self.url, params=params, headers={'User-Agent': UserAgent().chrome})
+        return await async_get(self.url, params=aiohttp_params(params), headers={'User-Agent': UserAgent().chrome})
 
     async def tokenbalance(self, contractaddress: str, address: str) -> Dict[str, Any]:
         """
@@ -420,7 +359,7 @@ class Account:
             'contractaddress': contractaddress,
             'address': address
         }
-        return await async_get(self.url, params=params, headers={'User-Agent': UserAgent().chrome})
+        return await async_get(self.url, params=aiohttp_params(params), headers={'User-Agent': UserAgent().chrome})
 
     async def tokenbalancehistory(self, contractaddress: str, address: str, blockno: int) -> Dict[str, Any]:
         """
@@ -442,7 +381,7 @@ class Account:
             'address': address,
             'blockno': blockno
         }
-        return await async_get(self.url, params=params, headers={'User-Agent': UserAgent().chrome})
+        return await async_get(self.url, params=aiohttp_params(params), headers={'User-Agent': UserAgent().chrome})
 
     async def addresstokenbalance(self, address: str, page: Optional[int] = None,
                                   offset: Optional[int] = None) -> Dict[str, Any]:
@@ -461,16 +400,11 @@ class Account:
             'module': self.module,
             'action': action,
             'apikey': self.key,
-            'address': address
+            'address': address,
+            'page': page,
+            'offset': offset
         }
-
-        if page:
-            params['page'] = page
-
-        if offset:
-            params['offset'] = offset
-
-        return await async_get(self.url, params=params, headers={'User-Agent': UserAgent().chrome})
+        return await async_get(self.url, params=aiohttp_params(params), headers={'User-Agent': UserAgent().chrome})
 
     async def addresstokennftbalance(self, address: str, page: Optional[int] = None,
                                      offset: Optional[int] = None) -> Dict[str, Any]:
@@ -489,16 +423,11 @@ class Account:
             'module': self.module,
             'action': action,
             'apikey': self.key,
-            'address': address
+            'address': address,
+            'page': page,
+            'offset': offset
         }
-
-        if page:
-            params['page'] = page
-
-        if offset:
-            params['offset'] = offset
-
-        return await async_get(self.url, params=params, headers={'User-Agent': UserAgent().chrome})
+        return await async_get(self.url, params=aiohttp_params(params), headers={'User-Agent': UserAgent().chrome})
 
     async def addresstokennftinventory(self, address: str, page: Optional[int] = None,
                                        offset: Optional[int] = None) -> Dict[str, Any]:
@@ -517,16 +446,11 @@ class Account:
             'module': self.module,
             'action': action,
             'apikey': self.key,
-            'address': address
+            'address': address,
+            'page': page,
+            'offset': offset
         }
-
-        if page:
-            params['page'] = page
-
-        if offset:
-            params['offset'] = offset
-
-        return await async_get(self.url, params=params, headers={'User-Agent': UserAgent().chrome})
+        return await async_get(self.url, params=aiohttp_params(params), headers={'User-Agent': UserAgent().chrome})
 
 
 class Contract:
@@ -551,7 +475,7 @@ class Contract:
             'apikey': self.key,
             'address': address
         }
-        return await async_get(self.url, params=params, headers={'User-Agent': UserAgent().chrome})
+        return await async_get(self.url, params=aiohttp_params(params), headers={'User-Agent': UserAgent().chrome})
 
     async def getsourcecode(self, address: str) -> Dict[str, Any]:
         """
@@ -569,7 +493,7 @@ class Contract:
             'apikey': self.key,
             'address': address
         }
-        return await async_get(self.url, params=params, headers={'User-Agent': UserAgent().chrome})
+        return await async_get(self.url, params=aiohttp_params(params), headers={'User-Agent': UserAgent().chrome})
 
     async def getcontractcreation(self, addresses: List[str]) -> Dict[str, Any]:
         """
@@ -587,7 +511,7 @@ class Contract:
             'apikey': self.key,
             'address': addresses
         }
-        return await async_get(self.url, params=params, headers={'User-Agent': UserAgent().chrome})
+        return await async_get(self.url, params=aiohttp_params(params), headers={'User-Agent': UserAgent().chrome})
 
 
 class Transaction:
@@ -612,7 +536,7 @@ class Transaction:
             'apikey': self.key,
             'txhash': txhash
         }
-        return await async_get(self.url, params=params, headers={'User-Agent': UserAgent().chrome})
+        return await async_get(self.url, params=aiohttp_params(params), headers={'User-Agent': UserAgent().chrome})
 
     async def gettxreceiptstatus(self, txhash: str) -> Dict[str, Any]:
         """
@@ -630,7 +554,7 @@ class Transaction:
             'apikey': self.key,
             'txhash': txhash
         }
-        return await async_get(self.url, params=params, headers={'User-Agent': UserAgent().chrome})
+        return await async_get(self.url, params=aiohttp_params(params), headers={'User-Agent': UserAgent().chrome})
 
 
 class Block:
@@ -655,7 +579,7 @@ class Block:
             'apikey': self.key,
             'blockno': blockno
         }
-        return await async_get(self.url, params=params, headers={'User-Agent': UserAgent().chrome})
+        return await async_get(self.url, params=aiohttp_params(params), headers={'User-Agent': UserAgent().chrome})
 
     async def getblockcountdown(self, blockno: int) -> Dict[str, Any]:
         """
@@ -673,7 +597,7 @@ class Block:
             'apikey': self.key,
             'blockno': blockno
         }
-        return await async_get(self.url, params=params, headers={'User-Agent': UserAgent().chrome})
+        return await async_get(self.url, params=aiohttp_params(params), headers={'User-Agent': UserAgent().chrome})
 
     async def getblocknobytime(self, timestamp: int, closest: Union[str, Closest] = Closest.Before) -> Dict[str, Any]:
         """
@@ -696,7 +620,7 @@ class Block:
             'timestamp': timestamp,
             'closest': closest
         }
-        return await async_get(self.url, params=params, headers={'User-Agent': UserAgent().chrome})
+        return await async_get(self.url, params=aiohttp_params(params), headers={'User-Agent': UserAgent().chrome})
 
 
 class Logs:
@@ -727,19 +651,14 @@ class Logs:
             'apikey': self.key,
             'address': address,
             'fromBlock': fromBlock,
-            'toBlock': toBlock
+            'toBlock': toBlock,
+            'page': page,
+            'offset': offset
         }
-
-        if page:
-            params['page'] = page
-
-        if offset:
-            params['offset'] = offset
-
         for key, value in kwargs.items():
             params[key] = value
 
-        return await async_get(self.url, params=params, headers={'User-Agent': UserAgent().chrome})
+        return await async_get(self.url, params=aiohttp_params(params), headers={'User-Agent': UserAgent().chrome})
 
 
 class Token:
@@ -765,16 +684,11 @@ class Token:
             'module': self.module,
             'action': action,
             'apikey': self.key,
-            'contractaddress': contractaddress
+            'contractaddress': contractaddress,
+            'page': page,
+            'offset': offset
         }
-
-        if page:
-            params['page'] = page
-
-        if offset:
-            params['offset'] = offset
-
-        return await async_get(self.url, params=params, headers={'User-Agent': UserAgent().chrome})
+        return await async_get(self.url, params=aiohttp_params(params), headers={'User-Agent': UserAgent().chrome})
 
     async def tokeninfo(self, contractaddress: str) -> Dict[str, Any]:
         """
@@ -792,7 +706,7 @@ class Token:
             'apikey': self.key,
             'contractaddress': contractaddress
         }
-        return await async_get(self.url, params=params, headers={'User-Agent': UserAgent().chrome})
+        return await async_get(self.url, params=aiohttp_params(params), headers={'User-Agent': UserAgent().chrome})
 
 
 class Gastracker:
@@ -817,7 +731,7 @@ class Gastracker:
             'apikey': self.key,
             'gasprice': gasprice
         }
-        return await async_get(self.url, params=params, headers={'User-Agent': UserAgent().chrome})
+        return await async_get(self.url, params=aiohttp_params(params), headers={'User-Agent': UserAgent().chrome})
 
     async def gasoracle(self) -> Dict[str, Any]:
         """
@@ -833,7 +747,7 @@ class Gastracker:
             'action': action,
             'apikey': self.key
         }
-        return await async_get(self.url, params=params, headers={'User-Agent': UserAgent().chrome})
+        return await async_get(self.url, params=aiohttp_params(params), headers={'User-Agent': UserAgent().chrome})
 
 
 class Stats:
@@ -856,7 +770,7 @@ class Stats:
             'action': action,
             'apikey': self.key
         }
-        return await async_get(self.url, params=params, headers={'User-Agent': UserAgent().chrome})
+        return await async_get(self.url, params=aiohttp_params(params), headers={'User-Agent': UserAgent().chrome})
 
     async def ethsupply2(self) -> Dict[str, Any]:
         """
@@ -872,7 +786,7 @@ class Stats:
             'action': action,
             'apikey': self.key
         }
-        return await async_get(self.url, params=params, headers={'User-Agent': UserAgent().chrome})
+        return await async_get(self.url, params=aiohttp_params(params), headers={'User-Agent': UserAgent().chrome})
 
     async def ethprice(self) -> Dict[str, Any]:
         """
@@ -888,7 +802,7 @@ class Stats:
             'action': action,
             'apikey': self.key
         }
-        return await async_get(self.url, params=params, headers={'User-Agent': UserAgent().chrome})
+        return await async_get(self.url, params=aiohttp_params(params), headers={'User-Agent': UserAgent().chrome})
 
     async def chainsize(self, startdate: str, enddate: str, clienttype: Union[str, ClientType] = ClientType.Geth,
                         syncmode: Union[str, SyncMode] = SyncMode.Default,
@@ -925,7 +839,7 @@ class Stats:
             'syncmode': syncmode,
             'sort': sort
         }
-        return await async_get(self.url, params=params, headers={'User-Agent': UserAgent().chrome})
+        return await async_get(self.url, params=aiohttp_params(params), headers={'User-Agent': UserAgent().chrome})
 
     async def nodecount(self) -> Dict[str, Any]:
         """
@@ -941,7 +855,7 @@ class Stats:
             'action': action,
             'apikey': self.key
         }
-        return await async_get(self.url, params=params, headers={'User-Agent': UserAgent().chrome})
+        return await async_get(self.url, params=aiohttp_params(params), headers={'User-Agent': UserAgent().chrome})
 
     async def general(self, action: str, startdate: str, enddate: str,
                       sort: Union[str, Sort] = Sort.Asc) -> Dict[str, Any]:
@@ -965,7 +879,7 @@ class Stats:
             'enddate': enddate,
             'sort': sort
         }
-        return await async_get(self.url, params=params, headers={'User-Agent': UserAgent().chrome})
+        return await async_get(self.url, params=aiohttp_params(params), headers={'User-Agent': UserAgent().chrome})
 
     async def dailytxnfee(self, startdate: str, enddate: str, sort: Union[str, Sort] = Sort.Asc) -> Dict[str, Any]:
         """
@@ -1198,7 +1112,7 @@ class Stats:
             'apikey': self.key,
             'contractaddress': contractaddress
         }
-        return await async_get(self.url, params=params, headers={'User-Agent': UserAgent().chrome})
+        return await async_get(self.url, params=aiohttp_params(params), headers={'User-Agent': UserAgent().chrome})
 
     async def tokensupplyhistory(self, contractaddress: str, blockno: int) -> Dict[str, Any]:
         """
@@ -1218,4 +1132,4 @@ class Stats:
             'contractaddress': contractaddress,
             'blockno': blockno
         }
-        return await async_get(self.url, params=params, headers={'User-Agent': UserAgent().chrome})
+        return await async_get(self.url, params=aiohttp_params(params), headers={'User-Agent': UserAgent().chrome})

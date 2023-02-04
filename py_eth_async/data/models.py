@@ -156,7 +156,7 @@ class Networks:
                               factory='0x5757371414417b8C6CAad45bAeF941aBc7d3Ab32',
                               router='0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff'))
     Avalanche = Network(name='avalanche',
-                        rpc='https://api.avax.network/ext/bc/C/rpc/',
+                        rpc='https://rpc.ankr.com/avalanche/',
                         chain_id=43114,
                         coin_symbol='AVAX',
                         explorer='https://snowtrace.io/',

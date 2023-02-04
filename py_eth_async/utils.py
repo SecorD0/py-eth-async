@@ -1,4 +1,4 @@
-from typing import Union, Optional
+from typing import Union, Optional, Dict, Any
 
 import aiohttp
 from eth_typing import ChecksumAddress
@@ -20,6 +20,37 @@ def api_key_required(func):
     return func_wrapper
 
 
+def checksum(address: str) -> ChecksumAddress:
+    """
+    Convert an address to checksummed.
+
+    :param str address: the address
+    :return ChecksumAddress: the checksummed address
+    """
+    return to_checksum_address(address)
+
+
+def aiohttp_params(params: Union[Dict[str, Any], None]) -> Union[Dict[str, Union[str, int, float]], None]:
+    """
+    Convert requests params to aiohttp params.
+
+    :param Union[Dict[str, Any], None] params: requests params
+    :return Union[Dict[str, Union[str, int, float]], None]: aiohttp params
+    """
+    new_params = params.copy()
+    if not params:
+        return
+
+    for key, value in params.items():
+        if value is None:
+            del new_params[key]
+
+        if isinstance(value, bool):
+            new_params[key] = str(value).lower()
+
+    return new_params
+
+
 async def async_get(url: str, headers: Optional[dict] = None, **kwargs) -> Optional[dict]:
     """
     Make asynchronous GET request.
@@ -35,16 +66,6 @@ async def async_get(url: str, headers: Optional[dict] = None, **kwargs) -> Optio
                 return await response.json()
 
             raise exceptions.HTTPException()
-
-
-def checksum(address: str) -> ChecksumAddress:
-    """
-    Convert an address to checksummed.
-
-    :param str address: the address
-    :return ChecksumAddress: the checksummed address
-    """
-    return to_checksum_address(address)
 
 
 async def get_coin_symbol(chain_id: Union[int, str]) -> str:

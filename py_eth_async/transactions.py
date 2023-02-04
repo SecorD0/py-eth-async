@@ -232,7 +232,7 @@ class Transactions:
 
     async def auto_add_params(self, tx_params: TxParams) -> TxParams:
         """
-        Add 'chainId', 'from', 'gasPrice' and 'gas' parameters to transaction parameters if they are missing.
+        Add 'chainId', 'nonce', 'from', 'gasPrice' and 'gas' parameters to transaction parameters if they are missing.
 
         :param TxParams tx_params: parameters of the transaction
         :return TxParams: parameters of the transaction with added values
@@ -240,13 +240,22 @@ class Transactions:
         if 'chainId' not in tx_params:
             tx_params['chainId'] = self.client.network.chain_id
 
+        if 'nonce' not in tx_params:
+            tx_params['nonce'] = await self.client.wallet.nonce()
+
         if 'from' not in tx_params:
             tx_params['from'] = self.client.account.address
 
-        if 'gasPrice' not in tx_params:
+        if 'gasPrice' not in tx_params or not int(tx_params['gasPrice']):
+            if 'gasPrice' in tx_params:
+                del tx_params['gasPrice']
+
             tx_params['gasPrice'] = (await self.current_gas_price(w3=self.client.w3)).Wei
 
-        if 'gas' not in tx_params:
+        if 'gas' not in tx_params or not int(tx_params['gas']):
+            if 'gas' in tx_params:
+                del tx_params['gas']
+
             tx_params['gas'] = (await self.estimate_gas(w3=self.client.w3, tx_params=tx_params)).Wei
 
         return tx_params
@@ -263,7 +272,7 @@ class Transactions:
 
     async def sign_and_send(self, tx_params: TxParams) -> Tx:
         """
-        Sign and send a transaction. Additionally, add 'chainId', 'from', 'gasPrice' and 'gas' parameters to transaction parameters if they are missing.
+        Sign and send a transaction. Additionally, add 'chainId', 'nonce', 'from', 'gasPrice' and 'gas' parameters to transaction parameters if they are missing.
 
         :param TxParams tx_params: parameters of the transaction
         :return Tx: the instance of the sent transaction
