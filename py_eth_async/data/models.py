@@ -1,7 +1,7 @@
 import json
 from dataclasses import dataclass
 from decimal import Decimal
-from typing import Optional, Union, Dict, List, Any
+from typing import Optional, Union, Dict, List, Any, Tuple
 
 import requests
 from eth_typing import ChecksumAddress
@@ -712,6 +712,32 @@ class TxHistory(AutoRepr):
 
             elif tx.from_ == self.address:
                 self.erc721.outgoing[tx.hash] = tx
+
+
+class TxArgs(AutoRepr):
+    def __init__(self, **kwargs) -> None:
+        """
+        An instance for named transaction arguments.
+
+        :param kwargs: named arguments of a contract transaction
+        """
+        self.__dict__.update(kwargs)
+
+    def list(self) -> List[Any]:
+        """
+        Get list of transaction arguments.
+
+        :return List[Any]: list of transaction arguments
+        """
+        return list(self.__dict__.values())
+
+    def tuple(self) -> Tuple[Any]:
+        """
+        Get tuple of transaction arguments.
+
+        :return Tuple[Any]: tuple of transaction arguments
+        """
+        return tuple(self.__dict__.values())
 
 
 class Unit(AutoRepr):

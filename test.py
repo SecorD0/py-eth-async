@@ -5,7 +5,7 @@ import random
 from web3.contract import AsyncContract
 
 from py_eth_async.client import Client
-from py_eth_async.data.models import Networks, Wei, Ether, GWei, TokenAmount, Network
+from py_eth_async.data.models import Networks, Wei, Ether, GWei, TokenAmount, Network, TxArgs
 from py_eth_async.transactions import Tx
 from py_eth_async.utils import get_coin_symbol
 
@@ -388,6 +388,23 @@ Usage for gas price: {GWei(14.64734)}
 ----------------------------------------------------------------------------''')
 
     @staticmethod
+    async def tx_args():
+        """Initialize the custom network."""
+        client = Client(private_key=private_key)
+        args = TxArgs(
+            amount=1000000,
+            address=client.account.address,
+            pair=TxArgs(
+                suource_token='0x7F5c764cBc14f9669B88837ca1490cCa17c31607',
+                dest_token='0x94b008aA00579c1307B0EF2c499aD98a8ce58e58'
+            ).list()
+        )
+        print(f'''{args}
+{args.list()}
+{args.tuple()}
+----------------------------------------------------------------------------''')
+
+    @staticmethod
     async def change_decimals():
         """Leave the Ether amount and change the Wei based on the new decimals."""
         token = TokenAmount(amount=500.73467)
@@ -435,6 +452,7 @@ async def main() -> None:
     print('\n--------- Miscellaneous ---------')
     miscellaneous = Miscellaneous()
     await miscellaneous.custom_network()
+    await miscellaneous.tx_args()
     await miscellaneous.units()
     await miscellaneous.change_decimals()
 
