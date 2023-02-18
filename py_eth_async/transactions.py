@@ -401,7 +401,7 @@ class Transactions:
             if isinstance(gas_price, float) or isinstance(gas_price, int):
                 gas_price = GWei(gas_price)
 
-        if check_gas_price and current_gas_price.Wei > gas_price.Wei:
+        if check_gas_price and current_gas_price > gas_price:
             raise exceptions.GasPriceTooHigh()
 
         if not nonce:
@@ -489,7 +489,7 @@ class Transactions:
             if isinstance(gas_price, float) or isinstance(gas_price, int):
                 gas_price = GWei(gas_price)
 
-        if check_gas_price and current_gas_price.Wei > gas_price.Wei:
+        if check_gas_price and current_gas_price > gas_price:
             raise exceptions.GasPriceTooHigh()
 
         if not nonce:
