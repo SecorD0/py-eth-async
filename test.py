@@ -37,7 +37,8 @@ class Account:
         address = '0xe4C004883BE7EB6e059005aAf6A34B45722fE3c9'
         contract = await client.contracts.get(contract_address='0x326c977e6efc84e512bb9c30f76e30c160ed06fb')
         coin_symbol = await contract.functions.symbol().call()
-        print(f'''Your ({client.account.address}) balance: {(await client.wallet.balance(token=contract)).Ether} {coin_symbol}
+        print(
+            f'''Your ({client.account.address}) balance: {(await client.wallet.balance(token=contract)).Ether} {coin_symbol}
 {address} balance: {(await client.wallet.balance(token='0x326c977e6efc84e512bb9c30f76e30c160ed06fb',
                                                  address=address)).Ether} {coin_symbol}''')
 
@@ -467,6 +468,32 @@ Great and equal
 0.5 >= 0.03: {0.5 >= Ether(0.03)}''')
 
     @staticmethod
+    async def unit_advanced_math_operations():
+        """Example of advanced mathematical operations on a Unit instance."""
+        print('\n--- unit_advanced_math_operations ---')
+        amount = Wei(100)
+        print(f'Before the transformation: {amount.Wei}')
+        amount += 20 + Wei(5)
+        print(f'After: {amount.Wei}\n')
+
+        amount = GWei(4.1)
+        print(f'Before the transformation: {amount.GWei}')
+        amount -= 2.0
+        # amount -= 2.0 - GWei(1)  # Works incorrect
+        print(f'After: {amount.GWei}\n')
+
+        amount = Wei(3020)
+        print(f'Before the transformation: {amount.Wei}')
+        amount *= Wei(100) * 8
+        print(f'After: {amount.Wei}\n')
+
+        amount = Ether(0.5)
+        print(f'Before the transformation: {amount.Ether}')
+        amount /= 0.1
+        # amount /= 0.1 - Ether(0.03)  # Works incorrect
+        print(f'After: {amount.Ether}')
+
+    @staticmethod
     async def token_amount_math_operations():
         """Example of mathematical operations on a TokenAmount instance."""
         print('\n--- token_amount_math_operations ---')
@@ -505,6 +532,32 @@ Great than
 Great and equal
 100 >= 100: {TokenAmount(100, decimals=6) >= 100.0}
 2.0 >= 4.1: {2.0 >= TokenAmount(4.1, decimals=6)}''')
+
+    @staticmethod
+    async def token_amount_advanced_math_operations():
+        """Example of advanced mathematical operations on a TokenAmount instance."""
+        print('\n--- token_amount_advanced_math_operations ---')
+        amount = TokenAmount(100, decimals=6)
+        print(f'Before the transformation: {amount.Ether}')
+        amount += 20.0 + TokenAmount(5, decimals=6)
+        print(f'After: {amount.Ether}\n')
+
+        amount = TokenAmount(100, decimals=6)
+        print(f'Before the transformation: {amount.Ether}')
+        amount -= 20.0
+        # amount -= 20.0 - TokenAmount(5, decimals=6)  # Works incorrect
+        print(f'After: {amount.Ether}\n')
+
+        amount = TokenAmount(100, decimals=6)
+        print(f'Before the transformation: {amount.Ether}')
+        amount *= 20.0 * TokenAmount(5, decimals=6)
+        print(f'After: {amount.Ether}\n')
+
+        amount = TokenAmount(100, decimals=6)
+        print(f'Before the transformation: {amount.Ether}')
+        amount /= 20.0
+        # amount /= 20.0 / TokenAmount(5, decimals=6)  # Works incorrect
+        print(f'After: {amount.Ether}')
 
     @staticmethod
     async def change_decimals():
@@ -557,7 +610,9 @@ async def main() -> None:
     await miscellaneous.tx_args()
     await miscellaneous.units()
     await miscellaneous.unit_math_operations()
+    await miscellaneous.unit_advanced_math_operations()
     await miscellaneous.token_amount_math_operations()
+    await miscellaneous.token_amount_advanced_math_operations()
     await miscellaneous.change_decimals()
 
 

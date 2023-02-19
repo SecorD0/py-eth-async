@@ -897,6 +897,18 @@ class Unit(AutoRepr):
         else:
             raise ArithmeticError(f"{type(other)} type isn't supported!")
 
+    def __iadd__(self, other):
+        return self.__add__(other)
+
+    def __isub__(self, other):
+        return self.__sub__(other)
+
+    def __imul__(self, other):
+        return self.__mul__(other)
+
+    def __itruediv__(self, other):
+        return self.__truediv__(other)
+
     def __lt__(self, other):
         if isinstance(other, Unit):
             return self.Wei < other.Wei
@@ -1213,11 +1225,9 @@ class TokenAmount(AutoRepr):
             if self.decimals != other.decimals:
                 raise ArithmeticError('The values have different decimals!')
 
-            print(1)
             return TokenAmount(self.Ether * other.Ether, decimals=self.decimals)
 
         elif isinstance(other, int):
-            print(2)
             return TokenAmount(self.Wei * other, decimals=self.decimals, wei=True)
 
         elif isinstance(other, float):
@@ -1273,6 +1283,18 @@ class TokenAmount(AutoRepr):
 
         else:
             raise ArithmeticError(f"{type(other)} type isn't supported!")
+
+    def __iadd__(self, other):
+        return self.__add__(other)
+
+    def __isub__(self, other):
+        return self.__sub__(other)
+
+    def __imul__(self, other):
+        return self.__mul__(other)
+
+    def __itruediv__(self, other):
+        return self.__truediv__(other)
 
     def __lt__(self, other):
         if isinstance(other, TokenAmount):

@@ -67,10 +67,9 @@ class Tx(AutoRepr):
             await self.parse_params(client=client)
 
         try:
-            self.function_identifier, self.input_data = await Transactions.decode_input_data(client=client,
-                                                                                             contract=contract,
-                                                                                             input_data=self.params.get(
-                                                                                                 'data'))
+            self.function_identifier, self.input_data = await Transactions.decode_input_data(
+                client=client, contract=contract, input_data=self.params.get('data')
+            )
 
         except:
             pass
