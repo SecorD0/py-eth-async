@@ -619,7 +619,8 @@ async def main() -> None:
 if __name__ == '__main__':
     private_key = str(os.getenv('PRIVATE_KEY'))
     if private_key:
-        asyncio.run(main())
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(main())
 
     else:
         print("Specify the private key in the 'PRIVATE_KEY' variable in the .env file!")
