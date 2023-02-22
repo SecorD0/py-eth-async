@@ -2,6 +2,10 @@ class ClientException(Exception):
     pass
 
 
+class InvalidProxy(ClientException):
+    pass
+
+
 class APIException(Exception):
     pass
 
