@@ -407,30 +407,31 @@ class Transactions:
         if not nonce:
             nonce = await self.client.wallet.nonce()
 
+        tx_params = {
+            'chainId': self.client.network.chain_id,
+            'nonce': nonce,
+            'gasPrice': gas_price.Wei,
+            'from': self.client.account.address
+        }
         if contract:
             balance = (await self.client.wallet.balance(token=contract)).Wei
             if balance < amount:
                 amount = balance
 
-            tx_params = {
-                'nonce': nonce,
-                'gasPrice': gas_price.Wei,
-                'from': self.client.account.address,
+            tx_params.update({
                 'to': contract.address,
                 'data': contract.encodeABI('transfer', args=TxArgs(recipient=recipient, amount=amount).tuple())
-            }
+            })
 
         else:
             balance = (await self.client.wallet.balance()).Wei
             if balance < amount:
                 amount = balance
 
-            tx_params = {
-                'nonce': nonce,
-                'gasPrice': gas_price.Wei,
+            tx_params.update({
                 'to': recipient,
                 'value': amount
-            }
+            })
 
         if not amount:
             raise exceptions.InsufficientBalance()

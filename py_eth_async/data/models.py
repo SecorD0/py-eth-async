@@ -105,7 +105,7 @@ class Networks:
                                factory='0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f',
                                router='0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D'))
     Arbitrum = Network(name='arbitrum',
-                       rpc='https://arb1.arbitrum.io/rpc/',
+                       rpc='https://rpc.ankr.com/arbitrum/',
                        chain_id=42161,
                        coin_symbol='ETH',
                        explorer='https://arbiscan.io/',
