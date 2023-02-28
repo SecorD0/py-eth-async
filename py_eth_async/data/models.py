@@ -749,6 +749,7 @@ class Unit(AutoRepr):
         :param str unit: a unit name
         """
         self.unit = unit
+        self.decimals = 18
         self.Wei: int = to_wei(amount, self.unit)
         self.KWei: Decimal = from_wei(self.Wei, 'kwei')
         self.MWei: Decimal = from_wei(self.Wei, 'mwei')
