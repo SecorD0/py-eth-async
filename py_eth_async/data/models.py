@@ -763,7 +763,10 @@ class Unit(AutoRepr):
         self.TEther: Decimal = from_wei(self.Wei, 'tether')
 
     def __add__(self, other):
-        if isinstance(other, Unit):
+        if isinstance(other, (Unit, TokenAmount)):
+            if self.decimals != other.decimals:
+                raise ArithmeticError('The values have different decimals!')
+
             return Wei(self.Wei + other.Wei)
 
         elif isinstance(other, int):
@@ -780,7 +783,10 @@ class Unit(AutoRepr):
             raise ArithmeticError(f"{type(other)} type isn't supported!")
 
     def __radd__(self, other):
-        if isinstance(other, Unit):
+        if isinstance(other, (Unit, TokenAmount)):
+            if self.decimals != other.decimals:
+                raise ArithmeticError('The values have different decimals!')
+
             return Wei(other.Wei + self.Wei)
 
         elif isinstance(other, int):
@@ -797,7 +803,10 @@ class Unit(AutoRepr):
             raise ArithmeticError(f"{type(other)} type isn't supported!")
 
     def __sub__(self, other):
-        if isinstance(other, Unit):
+        if isinstance(other, (Unit, TokenAmount)):
+            if self.decimals != other.decimals:
+                raise ArithmeticError('The values have different decimals!')
+
             return Wei(self.Wei - other.Wei)
 
         elif isinstance(other, int):
@@ -814,7 +823,10 @@ class Unit(AutoRepr):
             raise ArithmeticError(f"{type(other)} type isn't supported!")
 
     def __rsub__(self, other):
-        if isinstance(other, Unit):
+        if isinstance(other, (Unit, TokenAmount)):
+            if self.decimals != other.decimals:
+                raise ArithmeticError('The values have different decimals!')
+
             return Wei(other.Wei - self.Wei)
 
         elif isinstance(other, int):
@@ -831,7 +843,10 @@ class Unit(AutoRepr):
             raise ArithmeticError(f"{type(other)} type isn't supported!")
 
     def __mul__(self, other):
-        if isinstance(other, Unit):
+        if isinstance(other, (Unit, TokenAmount)):
+            if self.decimals != other.decimals:
+                raise ArithmeticError('The values have different decimals!')
+
             return Wei(self.Wei * other.Wei)
 
         elif isinstance(other, int):
@@ -848,7 +863,10 @@ class Unit(AutoRepr):
             raise ArithmeticError(f"{type(other)} type isn't supported!")
 
     def __rmul__(self, other):
-        if isinstance(other, Unit):
+        if isinstance(other, (Unit, TokenAmount)):
+            if self.decimals != other.decimals:
+                raise ArithmeticError('The values have different decimals!')
+
             return Wei(other.Wei * self.Wei)
 
         elif isinstance(other, int):
@@ -865,7 +883,10 @@ class Unit(AutoRepr):
             raise ArithmeticError(f"{type(other)} type isn't supported!")
 
     def __truediv__(self, other):
-        if isinstance(other, Unit):
+        if isinstance(other, (Unit, TokenAmount)):
+            if self.decimals != other.decimals:
+                raise ArithmeticError('The values have different decimals!')
+
             return Wei(self.Wei / other.Wei)
 
         elif isinstance(other, int):
@@ -882,7 +903,10 @@ class Unit(AutoRepr):
             raise ArithmeticError(f"{type(other)} type isn't supported!")
 
     def __rtruediv__(self, other):
-        if isinstance(other, Unit):
+        if isinstance(other, (Unit, TokenAmount)):
+            if self.decimals != other.decimals:
+                raise ArithmeticError('The values have different decimals!')
+
             return Wei(other.Wei / self.Wei)
 
         elif isinstance(other, int):
@@ -911,7 +935,10 @@ class Unit(AutoRepr):
         return self.__truediv__(other)
 
     def __lt__(self, other):
-        if isinstance(other, Unit):
+        if isinstance(other, (Unit, TokenAmount)):
+            if self.decimals != other.decimals:
+                raise ArithmeticError('The values have different decimals!')
+
             return self.Wei < other.Wei
 
         elif isinstance(other, int):
@@ -928,7 +955,10 @@ class Unit(AutoRepr):
             raise ArithmeticError(f"{type(other)} type isn't supported!")
 
     def __le__(self, other):
-        if isinstance(other, Unit):
+        if isinstance(other, (Unit, TokenAmount)):
+            if self.decimals != other.decimals:
+                raise ArithmeticError('The values have different decimals!')
+
             return self.Wei <= other.Wei
 
         elif isinstance(other, int):
@@ -945,7 +975,10 @@ class Unit(AutoRepr):
             raise ArithmeticError(f"{type(other)} type isn't supported!")
 
     def __eq__(self, other):
-        if isinstance(other, Unit):
+        if isinstance(other, (Unit, TokenAmount)):
+            if self.decimals != other.decimals:
+                raise ArithmeticError('The values have different decimals!')
+
             return self.Wei == other.Wei
 
         elif isinstance(other, int):
@@ -962,7 +995,10 @@ class Unit(AutoRepr):
             raise ArithmeticError(f"{type(other)} type isn't supported!")
 
     def __ne__(self, other):
-        if isinstance(other, Unit):
+        if isinstance(other, (Unit, TokenAmount)):
+            if self.decimals != other.decimals:
+                raise ArithmeticError('The values have different decimals!')
+
             return self.Wei != other.Wei
 
         elif isinstance(other, int):
@@ -979,7 +1015,10 @@ class Unit(AutoRepr):
             raise ArithmeticError(f"{type(other)} type isn't supported!")
 
     def __gt__(self, other):
-        if isinstance(other, Unit):
+        if isinstance(other, (Unit, TokenAmount)):
+            if self.decimals != other.decimals:
+                raise ArithmeticError('The values have different decimals!')
+
             return self.Wei > other.Wei
 
         elif isinstance(other, int):
@@ -996,7 +1035,10 @@ class Unit(AutoRepr):
             raise ArithmeticError(f"{type(other)} type isn't supported!")
 
     def __ge__(self, other):
-        if isinstance(other, Unit):
+        if isinstance(other, (Unit, TokenAmount)):
+            if self.decimals != other.decimals:
+                raise ArithmeticError('The values have different decimals!')
+
             return self.Wei >= other.Wei
 
         elif isinstance(other, int):
@@ -1158,7 +1200,7 @@ class TokenAmount(AutoRepr):
         return self.Wei
 
     def __add__(self, other):
-        if isinstance(other, TokenAmount):
+        if isinstance(other, (Unit, TokenAmount)):
             if self.decimals != other.decimals:
                 raise ArithmeticError('The values have different decimals!')
 
@@ -1174,7 +1216,7 @@ class TokenAmount(AutoRepr):
             raise ArithmeticError(f"{type(other)} type isn't supported!")
 
     def __radd__(self, other):
-        if isinstance(other, TokenAmount):
+        if isinstance(other, (Unit, TokenAmount)):
             if self.decimals != other.decimals:
                 raise ArithmeticError('The values have different decimals!')
 
@@ -1190,7 +1232,7 @@ class TokenAmount(AutoRepr):
             raise ArithmeticError(f"{type(other)} type isn't supported!")
 
     def __sub__(self, other):
-        if isinstance(other, TokenAmount):
+        if isinstance(other, (Unit, TokenAmount)):
             if self.decimals != other.decimals:
                 raise ArithmeticError('The values have different decimals!')
 
@@ -1206,7 +1248,7 @@ class TokenAmount(AutoRepr):
             raise ArithmeticError(f"{type(other)} type isn't supported!")
 
     def __rsub__(self, other):
-        if isinstance(other, TokenAmount):
+        if isinstance(other, (Unit, TokenAmount)):
             if self.decimals != other.decimals:
                 raise ArithmeticError('The values have different decimals!')
 
@@ -1222,7 +1264,7 @@ class TokenAmount(AutoRepr):
             raise ArithmeticError(f"{type(other)} type isn't supported!")
 
     def __mul__(self, other):
-        if isinstance(other, TokenAmount):
+        if isinstance(other, (Unit, TokenAmount)):
             if self.decimals != other.decimals:
                 raise ArithmeticError('The values have different decimals!')
 
@@ -1238,7 +1280,7 @@ class TokenAmount(AutoRepr):
             raise ArithmeticError(f"{type(other)} type isn't supported!")
 
     def __rmul__(self, other):
-        if isinstance(other, TokenAmount):
+        if isinstance(other, (Unit, TokenAmount)):
             if self.decimals != other.decimals:
                 raise ArithmeticError('The values have different decimals!')
 
@@ -1254,7 +1296,7 @@ class TokenAmount(AutoRepr):
             raise ArithmeticError(f"{type(other)} type isn't supported!")
 
     def __truediv__(self, other):
-        if isinstance(other, TokenAmount):
+        if isinstance(other, (Unit, TokenAmount)):
             if self.decimals != other.decimals:
                 raise ArithmeticError('The values have different decimals!')
 
@@ -1270,7 +1312,7 @@ class TokenAmount(AutoRepr):
             raise ArithmeticError(f"{type(other)} type isn't supported!")
 
     def __rtruediv__(self, other):
-        if isinstance(other, TokenAmount):
+        if isinstance(other, (Unit, TokenAmount)):
             if self.decimals != other.decimals:
                 raise ArithmeticError('The values have different decimals!')
 
@@ -1298,7 +1340,7 @@ class TokenAmount(AutoRepr):
         return self.__truediv__(other)
 
     def __lt__(self, other):
-        if isinstance(other, TokenAmount):
+        if isinstance(other, (Unit, TokenAmount)):
             if self.decimals != other.decimals:
                 raise ArithmeticError('The values have different decimals!')
 
@@ -1314,7 +1356,7 @@ class TokenAmount(AutoRepr):
             raise ArithmeticError(f"{type(other)} type isn't supported!")
 
     def __le__(self, other):
-        if isinstance(other, TokenAmount):
+        if isinstance(other, (Unit, TokenAmount)):
             if self.decimals != other.decimals:
                 raise ArithmeticError('The values have different decimals!')
 
@@ -1330,7 +1372,7 @@ class TokenAmount(AutoRepr):
             raise ArithmeticError(f"{type(other)} type isn't supported!")
 
     def __eq__(self, other):
-        if isinstance(other, TokenAmount):
+        if isinstance(other, (Unit, TokenAmount)):
             if self.decimals != other.decimals:
                 raise ArithmeticError('The values have different decimals!')
 
@@ -1346,7 +1388,7 @@ class TokenAmount(AutoRepr):
             raise ArithmeticError(f"{type(other)} type isn't supported!")
 
     def __ne__(self, other):
-        if isinstance(other, TokenAmount):
+        if isinstance(other, (Unit, TokenAmount)):
             if self.decimals != other.decimals:
                 raise ArithmeticError('The values have different decimals!')
 
@@ -1362,7 +1404,7 @@ class TokenAmount(AutoRepr):
             raise ArithmeticError(f"{type(other)} type isn't supported!")
 
     def __gt__(self, other):
-        if isinstance(other, TokenAmount):
+        if isinstance(other, (Unit, TokenAmount)):
             if self.decimals != other.decimals:
                 raise ArithmeticError('The values have different decimals!')
 
@@ -1378,7 +1420,7 @@ class TokenAmount(AutoRepr):
             raise ArithmeticError(f"{type(other)} type isn't supported!")
 
     def __ge__(self, other):
-        if isinstance(other, TokenAmount):
+        if isinstance(other, (Unit, TokenAmount)):
             if self.decimals != other.decimals:
                 raise ArithmeticError('The values have different decimals!')
 
