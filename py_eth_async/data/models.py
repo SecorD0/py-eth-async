@@ -98,7 +98,7 @@ class Networks:
                        chain_id=1,
                        coin_symbol='ETH',
                        explorer='https://etherscan.io/',
-                       api=API(key=config.ETHEREUM_APIKEY,
+                       api=API(key=config.ETHEREUM_API_KEY,
                                url='https://api.etherscan.io/api',
                                docs='https://docs.etherscan.io/'),
                        dex=DEX(name='uniswap_v2',
@@ -109,7 +109,7 @@ class Networks:
                        chain_id=42161,
                        coin_symbol='ETH',
                        explorer='https://arbiscan.io/',
-                       api=API(key=config.ARBITRUM_APIKEY,
+                       api=API(key=config.ARBITRUM_API_KEY,
                                url='https://api.arbiscan.io/api',
                                docs='https://docs.arbiscan.io/'),
                        dex=DEX(name='uniswap_v3',
@@ -120,7 +120,7 @@ class Networks:
                            chain_id=42170,
                            coin_symbol='ETH',
                            explorer='https://nova.arbiscan.io/',
-                           api=API(key=config.ARBITRUM_APIKEY,
+                           api=API(key=config.ARBITRUM_API_KEY,
                                    url='https://api-nova.arbiscan.io/api',
                                    docs='https://nova.arbiscan.io/apis/'))
     Optimism = Network(name='optimism',
@@ -128,7 +128,7 @@ class Networks:
                        chain_id=10,
                        coin_symbol='ETH',
                        explorer='https://optimistic.etherscan.io/',
-                       api=API(key=config.OPTIMISM_APIKEY,
+                       api=API(key=config.OPTIMISM_API_KEY,
                                url='https://api-optimistic.etherscan.io/api',
                                docs='https://docs.optimism.etherscan.io/'),
                        dex=DEX(name='uniswap_v3',
@@ -138,7 +138,7 @@ class Networks:
                   chain_id=56,
                   coin_symbol='BNB',
                   explorer='https://bscscan.com/',
-                  api=API(key=config.BSC_APIKEY,
+                  api=API(key=config.BSC_API_KEY,
                           url='https://api.bscscan.com/api',
                           docs='https://docs.bscscan.com/'),
                   dex=DEX(name='pancakeswap',
@@ -149,7 +149,7 @@ class Networks:
                       chain_id=137,
                       coin_symbol='MATIC',
                       explorer='https://polygonscan.com/',
-                      api=API(key=config.POLYGON_APIKEY,
+                      api=API(key=config.POLYGON_API_KEY,
                               url='https://api.polygonscan.com/api',
                               docs='https://docs.polygonscan.com/'),
                       dex=DEX(name='quickswap',
@@ -160,7 +160,7 @@ class Networks:
                         chain_id=43114,
                         coin_symbol='AVAX',
                         explorer='https://snowtrace.io/',
-                        api=API(key=config.AVALANCHE_APIKEY,
+                        api=API(key=config.AVALANCHE_API_KEY,
                                 url='https://api.snowtrace.io/api',
                                 docs='https://docs.snowtrace.io/'))
     Moonbeam = Network(name='moonbeam',
@@ -168,7 +168,7 @@ class Networks:
                        chain_id=1284,
                        coin_symbol='GLMR',
                        explorer='https://moonscan.io/',
-                       api=API(key=config.MOONBEAM_APIKEY,
+                       api=API(key=config.MOONBEAM_API_KEY,
                                url='https://api-moonbeam.moonscan.io/api',
                                docs='https://moonscan.io/apis/'))
     Fantom = Network(name='fantom',
@@ -176,7 +176,7 @@ class Networks:
                      chain_id=250,
                      coin_symbol='FTM',
                      explorer='https://ftmscan.com/',
-                     api=API(key=config.FANTOM_APIKEY,
+                     api=API(key=config.FANTOM_API_KEY,
                              url='https://api.ftmscan.com/api',
                              docs='https://docs.ftmscan.com/'))
     Celo = Network(name='celo',
@@ -184,7 +184,7 @@ class Networks:
                    chain_id=42220,
                    coin_symbol='CELO',
                    explorer='https://celoscan.io/',
-                   api=API(key=config.CELO_APIKEY,
+                   api=API(key=config.CELO_API_KEY,
                            url='https://api.celoscan.io/api',
                            docs='https://celoscan.io/apis/'))
     Gnosis = Network(name='gnosis',
@@ -192,7 +192,7 @@ class Networks:
                      chain_id=100,
                      coin_symbol='xDAI',
                      explorer='https://gnosisscan.io/',
-                     api=API(key=config.GNOSIS_APIKEY,
+                     api=API(key=config.GNOSIS_API_KEY,
                              url='https://api.gnosisscan.io/api',
                              docs='https://docs.gnosisscan.io/'))
     HECO = Network(name='heco',
@@ -200,7 +200,7 @@ class Networks:
                    chain_id=128,
                    coin_symbol='HT',
                    explorer='https://hecoinfo.com/',
-                   api=API(key=config.HECO_APIKEY,
+                   api=API(key=config.HECO_API_KEY,
                            url='https://api.hecoinfo.com/api',
                            docs='https://hecoinfo.com/apis'))
 
@@ -210,7 +210,7 @@ class Networks:
                      chain_id=5,
                      coin_symbol='ETH',
                      explorer='https://goerli.etherscan.io/',
-                     api=API(key=config.GOERLI_APIKEY,
+                     api=API(key=config.GOERLI_API_KEY,
                              url='https://api-goerli.etherscan.io/api',
                              docs='https://docs.etherscan.io/v/goerli-etherscan/'))
 
@@ -219,7 +219,7 @@ class Networks:
                       chain_id=11155111,
                       coin_symbol='ETH',
                       explorer='https://sepolia.etherscan.io/',
-                      api=API(key=config.SEPOLIA_APIKEY,
+                      api=API(key=config.SEPOLIA_API_KEY,
                               url='https://api-sepolia.etherscan.io/api',
                               docs='https://docs.etherscan.io/v/sepolia-etherscan/'))
 
