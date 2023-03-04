@@ -187,7 +187,7 @@ class Transactions:
         Get the current gas price.
 
         :param Web3Async w3: the Web3 instance
-        :return Wei: the current gas price in Wei
+        :return Wei: the current gas price
         """
         return Wei(await w3.eth.gas_price)
 
@@ -198,7 +198,7 @@ class Transactions:
 
         :param Web3Async w3: the Web3 instance
         :param TxParams tx_params: parameters of the transaction
-        :return Wei: the estimate gas in Wei
+        :return Wei: the estimate gas
         """
         return Wei(await w3.eth.estimate_gas(transaction=tx_params))
 
@@ -310,13 +310,16 @@ class Transactions:
 
     @api_key_required
     async def find_txs(self, contract: types.Contract, function_name: Optional[str] = '',
-                       address: Optional[types.Address] = None) -> Dict[str, CoinTx]:
+                       address: Optional[types.Address] = None, after_timestamp: int = 0,
+                       before_timestamp: int = 999_999_999_999) -> Dict[str, CoinTx]:
         """
         Find all transactions of interaction with the contract, in addition, you can filter transactions by the name of the contract function.
 
         :param Contract contract: the contract address or instance with which the interaction took place
         :param Optional[str] function_name: the function name for sorting (any)
         :param Optional[Address] address: the address to get the transaction list (imported to client address)
+        :param int after_timestamp: after what time to filter transactions (0)
+        :param int before_timestamp: before what time to filter transactions (infinity)
         :return Dict[str, CoinTx]: transactions found
         """
         contract_address, abi = await self.client.contracts.get_contract_attributes(contract)
@@ -327,6 +330,7 @@ class Transactions:
         coin_txs = (await self.client.network.api.functions.account.txlist(address))['result']
         for tx in coin_txs:
             if (
+                    after_timestamp < int(tx.get('timeStamp')) < before_timestamp and
                     tx.get('isError') == '0' and
                     tx.get('to') == contract_address.lower() and
                     function_name in tx.get('functionName')
