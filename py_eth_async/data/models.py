@@ -84,8 +84,11 @@ class Network(AutoRepr):
         if self.coin_symbol:
             self.coin_symbol = self.coin_symbol.upper()
 
-        if api:
-            self.api.functions = APIFunctions(api.key, api.url)
+        self.set_api_functions()
+
+    def set_api_functions(self):
+        if self.api and self.api.key and self.api.url:
+            self.api.functions = APIFunctions(self.api.key, self.api.url)
 
 
 class Networks:
