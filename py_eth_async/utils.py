@@ -11,7 +11,7 @@ def api_key_required(func):
     """Check if the explorer API key is specified."""
 
     def func_wrapper(self, *args, **kwargs):
-        if not self.client.network.api.key:
+        if not self.client.network.api.key or not self.client.network.api.functions:
             raise exceptions.APIException('To use this function, you must specify the explorer API key!')
 
         else:
@@ -30,13 +30,15 @@ def checksum(address: str) -> ChecksumAddress:
     return to_checksum_address(address)
 
 
-def aiohttp_params(params: Union[Dict[str, Any], None]) -> Union[Dict[str, Union[str, int, float]], None]:
+def aiohttp_params(params: Optional[Dict[str, Any]]) -> Optional[Dict[str, Union[str, int, float]]]:
     """
     Convert requests params to aiohttp params.
 
-    :param Union[Dict[str, Any], None] params: requests params
-    :return Union[Dict[str, Union[str, int, float]], None]: aiohttp params
+    :param Optional[Dict[str, Any]] params: requests params
+    :return Optional[Dict[str, Union[str, int, float]]]: aiohttp params
     """
+    print("This function will be depricated in the next major update. "
+          "Use the 'aiohttp_params' function from the 'pretty-utils' library.")
     new_params = params.copy()
     if not params:
         return
@@ -47,6 +49,9 @@ def aiohttp_params(params: Union[Dict[str, Any], None]) -> Union[Dict[str, Union
 
         if isinstance(value, bool):
             new_params[key] = str(value).lower()
+
+        elif isinstance(value, bytes):
+            new_params[key] = value.decode('utf-8')
 
     return new_params
 
@@ -62,10 +67,16 @@ async def async_get(url: str, headers: Optional[dict] = None, **kwargs) -> Optio
     """
     async with aiohttp.ClientSession(headers=headers) as session:
         async with session.get(url=url, **kwargs) as response:
-            if response.status <= 201:
-                return await response.json()
+            status_code = response.status
+            response = await response.json()
+            if status_code <= 201:
+                status = response.get('status')
+                if status is not None and not int(status):
+                    raise exceptions.HTTPException(response=response, status_code=status_code)
 
-            raise exceptions.HTTPException()
+                return response
+
+            raise exceptions.HTTPException(response=response, status_code=status_code)
 
 
 async def get_coin_symbol(chain_id: Union[int, str]) -> str:

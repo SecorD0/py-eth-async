@@ -1,3 +1,6 @@
+from typing import Optional
+
+
 class ClientException(Exception):
     pass
 
@@ -43,4 +46,12 @@ class WalletException(Exception):
 
 
 class HTTPException(Exception):
-    pass
+    def __init__(self, response: Optional[dict] = None, status_code: Optional[int] = None) -> None:
+        self.response = response
+        self.status_code = status_code
+
+    def __str__(self):
+        if self.response:
+            return f'{self.status_code}: {self.response}'
+
+        return f'{self.status_code}'

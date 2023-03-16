@@ -1,9 +1,10 @@
 from typing import Optional, Union, List, Dict, Any
 
 from fake_useragent import UserAgent
+from pretty_utils.miscellaneous.http import aiohttp_params
 
 from py_eth_async import exceptions
-from py_eth_async.utils import async_get, aiohttp_params
+from py_eth_async.utils import async_get
 
 
 class Tag:
