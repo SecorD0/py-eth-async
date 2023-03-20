@@ -37,6 +37,7 @@ class Client:
         self.headers = {
             'accept': '*/*',
             'accept-language': 'en-US,en;q=0.9',
+            'content-type': 'application/json',
             'user-agent': UserAgent().chrome
         }
         self.proxy = proxy
