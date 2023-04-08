@@ -37,7 +37,7 @@ def aiohttp_params(params: Optional[Dict[str, Any]]) -> Optional[Dict[str, Union
     :param Optional[Dict[str, Any]] params: requests params
     :return Optional[Dict[str, Union[str, int, float]]]: aiohttp params
     """
-    print("This function will be depricated in the next major update. "
+    print("This function will be deprecated in the next major update. "
           "Use the 'aiohttp_params' function from the 'pretty-utils' library.")
     new_params = params.copy()
     if not params:

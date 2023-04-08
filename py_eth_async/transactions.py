@@ -1,6 +1,7 @@
 from typing import Union, Optional, Dict, Any, Tuple
 
-from eth_account.datastructures import SignedTransaction
+from eth_account.datastructures import SignedTransaction, SignedMessage
+from eth_account.messages import encode_defunct
 from hexbytes import HexBytes
 from pretty_utils.type_functions.classes import AutoRepr
 from web3.contract import AsyncContract
@@ -125,8 +126,9 @@ class Tx(AutoRepr):
                 gas_limit = Wei(gas_limit)
 
             tx_params['gas'] = gas_limit.Wei
-            signed_tx = client.w3.eth.account.sign_transaction(transaction_dict=tx_params,
-                                                               private_key=client.account.key)
+            signed_tx = client.w3.eth.account.sign_transaction(
+                transaction_dict=tx_params, private_key=client.account.key
+            )
             tx_hash = await client.w3.eth.send_raw_transaction(transaction=signed_tx.rawTransaction)
             if tx_hash:
                 self.hash = tx_hash
@@ -161,8 +163,9 @@ class Tx(AutoRepr):
                 gas_limit = Wei(gas_limit)
 
             tx_params['gas'] = gas_limit.Wei
-            signed_tx = client.w3.eth.account.sign_transaction(transaction_dict=tx_params,
-                                                               private_key=client.account.key)
+            signed_tx = client.w3.eth.account.sign_transaction(
+                transaction_dict=tx_params, private_key=client.account.key
+            )
             tx_hash = await client.w3.eth.send_raw_transaction(transaction=signed_tx.rawTransaction)
             if tx_hash:
                 self.hash = tx_hash
@@ -263,14 +266,30 @@ class Transactions:
         return tx_params
 
     async def sign(self, tx_params: TxParams) -> SignedTransaction:
+        print("This method will be deprecated in a future update. Use 'sign_transaction' instead.")
+        return await self.sign_transaction(tx_params=tx_params)
+
+    async def sign_transaction(self, tx_params: TxParams) -> SignedTransaction:
         """
         Sign a transaction.
 
         :param TxParams tx_params: parameters of the transaction
         :return SignedTransaction: the signed transaction
         """
-        return self.client.w3.eth.account.sign_transaction(transaction_dict=tx_params,
-                                                           private_key=self.client.account.key)
+        return self.client.w3.eth.account.sign_transaction(
+            transaction_dict=tx_params, private_key=self.client.account.key
+        )
+
+    async def sign_message(self, message: str) -> SignedMessage:
+        """
+        Sign a message.
+
+        :param str message: the message
+        :return SignedMessage: the signed message
+        """
+        return self.client.w3.eth.account.sign_message(
+            encode_defunct(text=message), private_key=self.client.account.key
+        )
 
     async def sign_and_send(self, tx_params: TxParams) -> Tx:
         """
@@ -280,7 +299,7 @@ class Transactions:
         :return Tx: the instance of the sent transaction
         """
         await self.auto_add_params(tx_params=tx_params)
-        signed_tx = await self.sign(tx_params)
+        signed_tx = await self.sign_transaction(tx_params)
         tx_hash = await self.client.w3.eth.send_raw_transaction(transaction=signed_tx.rawTransaction)
         return Tx(tx_hash=tx_hash, params=tx_params)
 

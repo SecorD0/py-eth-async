@@ -42,7 +42,7 @@ class APIFunctions:
     def __init__(self, key: str, url: str) -> None:
         self.key = key
         self.url = url
-        self.headers = {'User-Agent': UserAgent().chrome}
+        self.headers = {'content-type': 'application/json', 'user-agent': UserAgent().chrome}
         self.account = Account(self.key, self.url, self.headers)
         self.contract = Contract(self.key, self.url, self.headers)
         self.transaction = Transaction(self.key, self.url, self.headers)

@@ -47,16 +47,18 @@ class Client:
                     self.proxy = f'http://{self.proxy}'
 
                 if check_proxy:
-                    your_ip = requests.get('http://eth0.me/', proxies={'http': self.proxy,
-                                                                       'https': self.proxy}).text.rstrip()
+                    your_ip = requests.get(
+                        'http://eth0.me/', proxies={'http': self.proxy, 'https': self.proxy}
+                    ).text.rstrip()
                     if your_ip not in proxy:
                         raise exceptions.InvalidProxy(f"Proxy doesn't work! Your IP is {your_ip}.")
 
             except Exception as e:
                 raise exceptions.InvalidProxy(str(e))
 
-        self.w3 = Web3(Web3.AsyncHTTPProvider(endpoint_uri=self.network.rpc,
-                                              request_kwargs={'proxy': self.proxy, 'headers': self.headers}))
+        self.w3 = Web3(Web3.AsyncHTTPProvider(
+            endpoint_uri=self.network.rpc, request_kwargs={'proxy': self.proxy, 'headers': self.headers}
+        ))
         if private_key:
             self.account = self.w3.eth.account.from_key(private_key=private_key)
 
