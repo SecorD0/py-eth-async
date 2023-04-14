@@ -106,11 +106,12 @@ class NFTs:
 
 class Transactions:
     @staticmethod
-    async def current_gas_price():
+    async def gas_price():
         """Get the current gas price."""
         print('\n--- current_gas_price ---')
         client = Client(private_key='', network=Networks.Ethereum)
-        print(f'''{(await client.transactions.current_gas_price(w3=client.w3)).GWei} GWei''')
+        print(f'''Gas price: {(await client.transactions.gas_price(w3=client.w3)).GWei} GWei
+Max priority fee: {(await client.transactions.max_priority_fee(w3=client.w3)).GWei} GWei''')
 
     @staticmethod
     async def estimate_gas():
@@ -119,7 +120,7 @@ class Transactions:
         client = Client(private_key=private_key)
         tx_params = {
             'nonce': 100,
-            'gasPrice': (await client.transactions.current_gas_price(w3=client.w3)).Wei,
+            'gasPrice': (await client.transactions.gas_price(w3=client.w3)).Wei,
             'to': client.account.address,
             'value': 1000000
         }
@@ -127,7 +128,7 @@ class Transactions:
 
     @staticmethod
     async def auto_add_params():
-        """Add 'chainId', 'from', 'gasPrice' and 'gas' parameters to transaction parameters if they are missing."""
+        """Add 'chainId', 'from', 'gasPrice' or 'maxFeePerGas' + 'maxPriorityFeePerGas' and 'gas' parameters to transaction parameters if they are missing."""
         print('\n--- auto_add_params ---')
         client = Client(private_key=private_key)
         tx_params = {
@@ -588,7 +589,7 @@ async def main() -> None:
 
     print('\n--------- Transactions ---------')
     transactions = Transactions()
-    await transactions.current_gas_price()
+    await transactions.gas_price()
     await transactions.estimate_gas()
     await transactions.auto_add_params()
     await transactions.parse_params()
