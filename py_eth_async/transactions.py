@@ -251,16 +251,21 @@ class Transactions:
         if 'from' not in tx_params:
             tx_params['from'] = self.client.account.address
 
-        if 'gasPrice' not in tx_params or not int(tx_params['gasPrice']):
-            if 'gasPrice' in tx_params:
-                del tx_params['gasPrice']
+        if 'gasPrice' not in tx_params and 'maxFeePerGas' not in tx_params:
+            gas_price = (await self.current_gas_price(w3=self.client.w3)).Wei
+            if self.client.network.tx_type == 2:
+                tx_params['maxFeePerGas'] = gas_price
 
+            else:
+                tx_params['gasPrice'] = gas_price
+
+        elif 'gasPrice' in tx_params and not int(tx_params['gasPrice']):
             tx_params['gasPrice'] = (await self.current_gas_price(w3=self.client.w3)).Wei
 
-        if 'gas' not in tx_params or not int(tx_params['gas']):
-            if 'gas' in tx_params:
-                del tx_params['gas']
+        if 'maxFeePerGas' in tx_params and 'maxPriorityFeePerGas' not in tx_params:
+            tx_params['maxPriorityFeePerGas'] = GWei(1.5).Wei
 
+        if 'gas' not in tx_params or not int(tx_params['gas']):
             tx_params['gas'] = (await self.estimate_gas(w3=self.client.w3, tx_params=tx_params)).Wei
 
         return tx_params
@@ -510,7 +515,6 @@ class Transactions:
         else:
             amount = amount.Wei
 
-        amount = amount
         spender = checksum(spender)
         current_gas_price = await self.current_gas_price(w3=self.client.w3)
         if not gas_price:

@@ -45,14 +45,17 @@ class DEX:
 
 
 class Network(AutoRepr):
-    def __init__(self, name: str, rpc: str, chain_id: Optional[int] = None, coin_symbol: Optional[str] = None,
-                 explorer: Optional[str] = None, api: Optional[API] = None, dex: Optional[DEX] = None) -> None:
+    def __init__(self, name: str, rpc: str, chain_id: Optional[int] = None, tx_type: int = 0,
+                 coin_symbol: Optional[str] = None, explorer: Optional[str] = None, api: Optional[API] = None,
+                 dex: Optional[DEX] = None) -> None:
         """
         A Network instance to use it in the Client.
 
         :param str name: a network name
         :param str rpc: the RPC URL
-        :param str coin_symbol: the coin symbol (parsed from the network)
+        :param Optional[int] chain_id: the chain ID (parsed automatically)
+        :param int tx_type: the main type of transactions in the network. Either 0 (legacy) or 2 (EIP-1559). (0)
+        :param Optional[str] coin_symbol: the coin symbol (parsed from the network)
         :param Optional[str] explorer: the explorer URL (None)
         :param Optional[API] api: an API instance (None)
         :param Optional[DEX] dex: a DEX instance (None)
@@ -60,6 +63,7 @@ class Network(AutoRepr):
         self.name: str = name.lower()
         self.rpc: str = rpc
         self.chain_id: Optional[int] = chain_id
+        self.tx_type: int = tx_type
         self.coin_symbol: Optional[str] = coin_symbol
         self.explorer: Optional[str] = explorer
         self.api: Optional[API] = api
@@ -96,135 +100,167 @@ class Networks:
     The most popular networks.
     """
     # Mainnets
-    Ethereum = Network(name='ethereum',
-                       rpc='https://rpc.ankr.com/eth/',
-                       chain_id=1,
-                       coin_symbol='ETH',
-                       explorer='https://etherscan.io/',
-                       api=API(key=config.ETHEREUM_API_KEY,
-                               url='https://api.etherscan.io/api',
-                               docs='https://docs.etherscan.io/'),
-                       dex=DEX(name='uniswap_v2',
-                               factory='0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f',
-                               router='0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D'))
-    Arbitrum = Network(name='arbitrum',
-                       rpc='https://rpc.ankr.com/arbitrum/',
-                       chain_id=42161,
-                       coin_symbol='ETH',
-                       explorer='https://arbiscan.io/',
-                       api=API(key=config.ARBITRUM_API_KEY,
-                               url='https://api.arbiscan.io/api',
-                               docs='https://docs.arbiscan.io/'),
-                       dex=DEX(name='uniswap_v3',
-                               factory='0x1F98431c8aD98523631AE4a59f267346ea31F984',
-                               router='0xE592427A0AEce92De3Edee1F18E0157C05861564'))
-    ArbitrumNova = Network(name='arbitrum_nova',
-                           rpc='https://nova.arbitrum.io/rpc/',
-                           chain_id=42170,
-                           coin_symbol='ETH',
-                           explorer='https://nova.arbiscan.io/',
-                           api=API(key=config.ARBITRUM_API_KEY,
-                                   url='https://api-nova.arbiscan.io/api',
-                                   docs='https://nova.arbiscan.io/apis/'))
-    Optimism = Network(name='optimism',
-                       rpc='https://rpc.ankr.com/optimism/',
-                       chain_id=10,
-                       coin_symbol='ETH',
-                       explorer='https://optimistic.etherscan.io/',
-                       api=API(key=config.OPTIMISM_API_KEY,
-                               url='https://api-optimistic.etherscan.io/api',
-                               docs='https://docs.optimism.etherscan.io/'),
-                       dex=DEX(name='uniswap_v3',
-                               router='0xE592427A0AEce92De3Edee1F18E0157C05861564'))
-    BSC = Network(name='bsc',
-                  rpc='https://bsc-dataseed.binance.org/',
-                  chain_id=56,
-                  coin_symbol='BNB',
-                  explorer='https://bscscan.com/',
-                  api=API(key=config.BSC_API_KEY,
-                          url='https://api.bscscan.com/api',
-                          docs='https://docs.bscscan.com/'),
-                  dex=DEX(name='pancakeswap',
-                          factory='0xcA143Ce32Fe78f1f7019d7d551a6402fC5350c73',
-                          router='0x10ED43C718714eb63d5aA57B78B54704E256024E'))
-    Polygon = Network(name='polygon',
-                      rpc='https://polygon-rpc.com/',
-                      chain_id=137,
-                      coin_symbol='MATIC',
-                      explorer='https://polygonscan.com/',
-                      api=API(key=config.POLYGON_API_KEY,
-                              url='https://api.polygonscan.com/api',
-                              docs='https://docs.polygonscan.com/'),
-                      dex=DEX(name='quickswap',
-                              factory='0x5757371414417b8C6CAad45bAeF941aBc7d3Ab32',
-                              router='0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff'))
-    Avalanche = Network(name='avalanche',
-                        rpc='https://rpc.ankr.com/avalanche/',
-                        chain_id=43114,
-                        coin_symbol='AVAX',
-                        explorer='https://snowtrace.io/',
-                        api=API(key=config.AVALANCHE_API_KEY,
-                                url='https://api.snowtrace.io/api',
-                                docs='https://docs.snowtrace.io/'))
-    Moonbeam = Network(name='moonbeam',
-                       rpc='https://rpc.api.moonbeam.network/',
-                       chain_id=1284,
-                       coin_symbol='GLMR',
-                       explorer='https://moonscan.io/',
-                       api=API(key=config.MOONBEAM_API_KEY,
-                               url='https://api-moonbeam.moonscan.io/api',
-                               docs='https://moonscan.io/apis/'))
-    Fantom = Network(name='fantom',
-                     rpc='https://rpc.ankr.com/fantom/',
-                     chain_id=250,
-                     coin_symbol='FTM',
-                     explorer='https://ftmscan.com/',
-                     api=API(key=config.FANTOM_API_KEY,
-                             url='https://api.ftmscan.com/api',
-                             docs='https://docs.ftmscan.com/'))
-    Celo = Network(name='celo',
-                   rpc='https://rpc.ankr.com/celo/',
-                   chain_id=42220,
-                   coin_symbol='CELO',
-                   explorer='https://celoscan.io/',
-                   api=API(key=config.CELO_API_KEY,
-                           url='https://api.celoscan.io/api',
-                           docs='https://celoscan.io/apis/'))
-    Gnosis = Network(name='gnosis',
-                     rpc='https://rpc.ankr.com/gnosis/',
-                     chain_id=100,
-                     coin_symbol='xDAI',
-                     explorer='https://gnosisscan.io/',
-                     api=API(key=config.GNOSIS_API_KEY,
-                             url='https://api.gnosisscan.io/api',
-                             docs='https://docs.gnosisscan.io/'))
-    HECO = Network(name='heco',
-                   rpc='https://http-mainnet.hecochain.com/',
-                   chain_id=128,
-                   coin_symbol='HT',
-                   explorer='https://hecoinfo.com/',
-                   api=API(key=config.HECO_API_KEY,
-                           url='https://api.hecoinfo.com/api',
-                           docs='https://hecoinfo.com/apis'))
+    Ethereum = Network(
+        name='ethereum',
+        rpc='https://rpc.ankr.com/eth/',
+        chain_id=1,
+        tx_type=2,
+        coin_symbol='ETH',
+        explorer='https://etherscan.io/',
+        api=API(key=config.ETHEREUM_API_KEY, url='https://api.etherscan.io/api', docs='https://docs.etherscan.io/'),
+        dex=DEX(
+            name='uniswap_v2', factory='0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f',
+            router='0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D'
+        )
+    )
+    Arbitrum = Network(
+        name='arbitrum',
+        rpc='https://rpc.ankr.com/arbitrum/',
+        chain_id=42161,
+        tx_type=2,
+        coin_symbol='ETH',
+        explorer='https://arbiscan.io/',
+        api=API(key=config.ARBITRUM_API_KEY, url='https://api.arbiscan.io/api', docs='https://docs.arbiscan.io/'),
+        dex=DEX(
+            name='uniswap_v3', factory='0x1F98431c8aD98523631AE4a59f267346ea31F984',
+            router='0xE592427A0AEce92De3Edee1F18E0157C05861564'
+        )
+    )
+    ArbitrumNova = Network(
+        name='arbitrum_nova',
+        rpc='https://nova.arbitrum.io/rpc/',
+        chain_id=42170,
+        tx_type=2,
+        coin_symbol='ETH',
+        explorer='https://nova.arbiscan.io/',
+        api=API(
+            key=config.ARBITRUM_API_KEY, url='https://api-nova.arbiscan.io/api', docs='https://nova.arbiscan.io/apis/'
+        )
+    )
+    Optimism = Network(
+        name='optimism',
+        rpc='https://rpc.ankr.com/optimism/',
+        chain_id=10,
+        tx_type=0,
+        coin_symbol='ETH',
+        explorer='https://optimistic.etherscan.io/',
+        api=API(
+            key=config.OPTIMISM_API_KEY, url='https://api-optimistic.etherscan.io/api',
+            docs='https://docs.optimism.etherscan.io/'
+        ),
+        dex=DEX(name='uniswap_v3', router='0xE592427A0AEce92De3Edee1F18E0157C05861564')
+    )
+    BSC = Network(
+        name='bsc',
+        rpc='https://bsc-dataseed.binance.org/',
+        chain_id=56,
+        tx_type=0,
+        coin_symbol='BNB',
+        explorer='https://bscscan.com/',
+        api=API(key=config.BSC_API_KEY, url='https://api.bscscan.com/api', docs='https://docs.bscscan.com/'),
+        dex=DEX(
+            name='pancakeswap', factory='0xcA143Ce32Fe78f1f7019d7d551a6402fC5350c73',
+            router='0x10ED43C718714eb63d5aA57B78B54704E256024E'
+        )
+    )
+    Polygon = Network(
+        name='polygon',
+        rpc='https://polygon-rpc.com/',
+        chain_id=137,
+        tx_type=2,
+        coin_symbol='MATIC',
+        explorer='https://polygonscan.com/',
+        api=API(
+            key=config.POLYGON_API_KEY, url='https://api.polygonscan.com/api', docs='https://docs.polygonscan.com/'
+        ),
+        dex=DEX(
+            name='quickswap', factory='0x5757371414417b8C6CAad45bAeF941aBc7d3Ab32',
+            router='0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff'
+        )
+    )
+    Avalanche = Network(
+        name='avalanche',
+        rpc='https://rpc.ankr.com/avalanche/',
+        chain_id=43114,
+        tx_type=2,
+        coin_symbol='AVAX',
+        explorer='https://snowtrace.io/',
+        api=API(key=config.AVALANCHE_API_KEY, url='https://api.snowtrace.io/api', docs='https://docs.snowtrace.io/')
+    )
+    Moonbeam = Network(
+        name='moonbeam',
+        rpc='https://rpc.api.moonbeam.network/',
+        chain_id=1284,
+        tx_type=2,
+        coin_symbol='GLMR',
+        explorer='https://moonscan.io/',
+        api=API(
+            key=config.MOONBEAM_API_KEY, url='https://api-moonbeam.moonscan.io/api', docs='https://moonscan.io/apis/'
+        )
+    )
+    Fantom = Network(
+        name='fantom',
+        rpc='https://rpc.ankr.com/fantom/',
+        chain_id=250,
+        tx_type=2,
+        coin_symbol='FTM',
+        explorer='https://ftmscan.com/',
+        api=API(key=config.FANTOM_API_KEY, url='https://api.ftmscan.com/api', docs='https://docs.ftmscan.com/')
+    )
+    Celo = Network(
+        name='celo',
+        rpc='https://rpc.ankr.com/celo/',
+        chain_id=42220,
+        tx_type=0,
+        coin_symbol='CELO',
+        explorer='https://celoscan.io/',
+        api=API(key=config.CELO_API_KEY, url='https://api.celoscan.io/api', docs='https://celoscan.io/apis/')
+    )
+    Gnosis = Network(
+        name='gnosis',
+        rpc='https://rpc.ankr.com/gnosis/',
+        chain_id=100,
+        tx_type=2,
+        coin_symbol='xDAI',
+        explorer='https://gnosisscan.io/',
+        api=API(key=config.GNOSIS_API_KEY, url='https://api.gnosisscan.io/api', docs='https://docs.gnosisscan.io/')
+    )
+    HECO = Network(
+        name='heco',
+        rpc='https://http-mainnet.hecochain.com/',
+        chain_id=128,
+        tx_type=2,
+        coin_symbol='HT',
+        explorer='https://hecoinfo.com/',
+        api=API(key=config.HECO_API_KEY, url='https://api.hecoinfo.com/api', docs='https://hecoinfo.com/apis')
+    )
 
     # Testnets
-    Goerli = Network(name='goerli',
-                     rpc='https://rpc.ankr.com/eth_goerli/',
-                     chain_id=5,
-                     coin_symbol='ETH',
-                     explorer='https://goerli.etherscan.io/',
-                     api=API(key=config.GOERLI_API_KEY,
-                             url='https://api-goerli.etherscan.io/api',
-                             docs='https://docs.etherscan.io/v/goerli-etherscan/'))
+    Goerli = Network(
+        name='goerli',
+        rpc='https://rpc.ankr.com/eth_goerli/',
+        chain_id=5,
+        tx_type=2,
+        coin_symbol='ETH',
+        explorer='https://goerli.etherscan.io/',
+        api=API(
+            key=config.GOERLI_API_KEY, url='https://api-goerli.etherscan.io/api',
+            docs='https://docs.etherscan.io/v/goerli-etherscan/'
+        )
+    )
 
-    Sepolia = Network(name='sepolia',
-                      rpc='https://rpc.ankr.com/eth_sepolia/',
-                      chain_id=11155111,
-                      coin_symbol='ETH',
-                      explorer='https://sepolia.etherscan.io/',
-                      api=API(key=config.SEPOLIA_API_KEY,
-                              url='https://api-sepolia.etherscan.io/api',
-                              docs='https://docs.etherscan.io/v/sepolia-etherscan/'))
+    Sepolia = Network(
+        name='sepolia',
+        rpc='https://rpc.ankr.com/eth_sepolia/',
+        chain_id=11155111,
+        tx_type=2,
+        coin_symbol='ETH',
+        explorer='https://sepolia.etherscan.io/',
+        api=API(
+            key=config.SEPOLIA_API_KEY, url='https://api-sepolia.etherscan.io/api',
+            docs='https://docs.etherscan.io/v/sepolia-etherscan/'
+        )
+    )
 
 
 class RawContract(AutoRepr):
