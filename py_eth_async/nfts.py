@@ -2,11 +2,9 @@ import json
 from typing import Union
 from urllib.request import urlopen
 
-from web3.contract import AsyncContract
-
 from py_eth_async import exceptions
 from py_eth_async.data import types
-from py_eth_async.data.models import NFT, RawContract
+from py_eth_async.data.models import NFT
 from py_eth_async.utils import async_get
 
 

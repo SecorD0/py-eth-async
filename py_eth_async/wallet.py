@@ -1,10 +1,9 @@
 from typing import Optional, Union
 
 from eth_typing import Address
-from web3.contract import AsyncContract
 
 from py_eth_async.data import types
-from py_eth_async.data.models import Wei, TokenAmount, RawContract
+from py_eth_async.data.models import Wei, TokenAmount
 from py_eth_async.utils import checksum
 
 
