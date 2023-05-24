@@ -1,7 +1,9 @@
 import random
 from typing import Optional
 
+import aiohttp
 import requests
+from aiohttp_socks import ProxyConnector
 from eth_account.signers.local import LocalAccount
 from fake_useragent import UserAgent
 from web3 import Web3
@@ -41,11 +43,13 @@ class Client:
             'user-agent': UserAgent().chrome
         }
         self.proxy = proxy
+        self.connector = None
         if self.proxy:
             try:
-                if 'http' not in self.proxy:
+                if 'http' not in self.proxy and 'socks5' not in self.proxy:
                     self.proxy = f'http://{self.proxy}'
 
+                self.connector = ProxyConnector.from_url(url=self.proxy)
                 if check_proxy:
                     your_ip = requests.get(
                         'http://eth0.me/', proxies={'http': self.proxy, 'https': self.proxy}, timeout=10
@@ -56,7 +60,7 @@ class Client:
             except Exception as e:
                 raise exceptions.InvalidProxy(str(e))
 
-        self.w3 = Web3(Web3.AsyncHTTPProvider(
+        self.w3 = Web3(provider=Web3.AsyncHTTPProvider(
             endpoint_uri=self.network.rpc, request_kwargs={'proxy': self.proxy, 'headers': self.headers}
         ))
         if private_key:
@@ -72,3 +76,13 @@ class Client:
         self.nfts = NFTs(self)
         self.transactions = Transactions(self)
         self.wallet = Wallet(self)
+
+    async def setup_proxy(self) -> Web3:
+        provider = Web3.AsyncHTTPProvider(
+            endpoint_uri=self.network.rpc, request_kwargs={'headers': self.headers}
+        )
+        await provider.cache_async_session(
+            session=aiohttp.ClientSession(connector=self.connector, raise_for_status=True)
+        )
+        self.w3 = Web3(provider=provider)
+        return self.w3
