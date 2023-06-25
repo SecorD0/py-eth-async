@@ -70,10 +70,6 @@ async def async_get(url: str, headers: Optional[dict] = None, **kwargs) -> Optio
             status_code = response.status
             response = await response.json()
             if status_code <= 201:
-                status = response.get('status')
-                if status is not None and not int(status):
-                    raise exceptions.HTTPException(response=response, status_code=status_code)
-
                 return response
 
             raise exceptions.HTTPException(response=response, status_code=status_code)
