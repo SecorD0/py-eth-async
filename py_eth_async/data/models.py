@@ -141,7 +141,7 @@ class Networks:
         name='optimism',
         rpc='https://rpc.ankr.com/optimism/',
         chain_id=10,
-        tx_type=0,
+        tx_type=2,
         coin_symbol='ETH',
         explorer='https://optimistic.etherscan.io/',
         api=API(

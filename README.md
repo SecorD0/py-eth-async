@@ -1,4 +1,4 @@
-<h1><p align="center">py-eth-async</p></h1><h1>
+<h1><p align="center">py-eth-async</p></h1>
 
 <p align="center"><img src="images/icons/app.png" width="400"></p>
 
@@ -51,7 +51,7 @@ pip install --force-reinstall git+https://github.com/SecorD0/py-eth-async
 <p align="right"><a href="#Content">To the content</a></p>
 
 ⠀You can express your gratitude to the developer by sending fund to crypto wallets!
-- Ethereum-like address (Ethereum, BSC, Moonbeam, etc.): `0x900649087b8D7b9f799F880427DacCF2286D8F20`
+- Address of EVM networks (Ethereum, Polygon, BSC, etc.): `0x900649087b8D7b9f799F880427DacCF2286D8F20`
 - USDT TRC-20: `TNpBdjcmR5KzMVCBJTRYMJp16gCkQHu84K`
 - SOL: `DoZpXzGj5rEZVhEVzYdtwpzbXR8ifk5bajHybAmZvR4H`
 - BTC: `bc1qs4a0c3fntlhzn9j297qdsh3splcju54xscjstc`
