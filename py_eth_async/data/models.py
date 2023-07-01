@@ -152,7 +152,7 @@ class Networks:
     )
     BSC = Network(
         name='bsc',
-        rpc='https://bsc-dataseed.binance.org/',
+        rpc='https://rpc.ankr.com/bsc/',
         chain_id=56,
         tx_type=0,
         coin_symbol='BNB',
@@ -165,7 +165,7 @@ class Networks:
     )
     Polygon = Network(
         name='polygon',
-        rpc='https://polygon-rpc.com/',
+        rpc='https://rpc.ankr.com/polygon/',
         chain_id=137,
         tx_type=2,
         coin_symbol='MATIC',
