@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 from dataclasses import dataclass
 from decimal import Decimal
@@ -90,9 +92,21 @@ class Network(AutoRepr):
 
         self.set_api_functions()
 
-    def set_api_functions(self):
+    def set_api_functions(self) -> None:
+        """
+        Update API functions after API key change.
+        """
         if self.api and self.api.key and self.api.url:
             self.api.functions = APIFunctions(self.api.key, self.api.url)
+
+    def is_equal(self, network: Network) -> bool:
+        """
+        Compare chain IDs of two networks.
+
+        :param Network network: the second network
+        :return bool: True if chain IDs are equal
+        """
+        return self.chain_id == network.chain_id
 
 
 class Networks:

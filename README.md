@@ -1,12 +1,12 @@
 <h1><p align="center">py-eth-async</p></h1>
 
-<p align="center"><img src="images/icons/app.png" width="400"></p>
+<p align="center"><img src="images/icons/library_icon.png" width="400"></p>
 
 
 
 <h1><p align="center">Content</p></h1>
 
-- [Short description](#Short-description)
+- [Description](#Description)
 - [Useful links](#Useful-links)
 - [Installation](#Installation)
 - [Report a bug or suggest an idea](#Report-a-bug-or-suggest-an-idea)
@@ -14,7 +14,7 @@
 
 
 
-<h1><p align="center">Short description</p></h1>
+<h1><p align="center">Description</p></h1>
 <p align="right"><a href="#Content">To the content</a></p>
 
 ⠀This library is an asynchronous add-on to the `Web3` library, designed to simplify interaction with it.
