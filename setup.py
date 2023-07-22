@@ -7,7 +7,7 @@ with open(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'README.md'),
 
 setup(
     name='py-eth-async',
-    version='1.7.0',
+    version='1.7.1',
     license='Apache-2.0',
     author='SecorD',
     description='',
@@ -23,5 +23,8 @@ setup(
         'eth', 'pyeth', 'py-eth', 'ethpy', 'eth-py', 'web3', 'pyweb3', 'py-web3', 'web3py', 'web3-py', 'async-eth',
         'pyethasync', 'py-eth-async', 'asyncethpy', 'async-eth-py', 'async-web3', 'pyweb3-async', 'py-web3-async',
         'async-web3py', 'async-web3-py'
+    ],
+    classifiers=[
+        'Programming Language :: Python :: 3.8'
     ]
 )

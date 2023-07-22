@@ -8,9 +8,9 @@ from eth_account.signers.local import LocalAccount
 from fake_useragent import UserAgent
 from web3 import Web3
 
-from py_eth_async import exceptions
 from py_eth_async.contracts import Contracts
 from py_eth_async.data.models import Network, Networks
+from py_eth_async.exceptions import InvalidProxy
 from py_eth_async.nfts import NFTs
 from py_eth_async.transactions import Transactions
 from py_eth_async.wallet import Wallet
@@ -28,9 +28,10 @@ class Client:
 
         :param str private_key: a private key of a wallet, specify '' in order not to import the wallet (generate a new one)
         :param Network network: a network instance (Goerli)
-        :param Optional[str] proxy: a proxy in one of the following formats:
+        :param Optional[str] proxy: an HTTP or SOCKS5 IPv4 proxy in one of the following formats:
             - login:password@proxy:port
             - http://login:password@proxy:port
+            - socks5://login:password@proxy:port
             - proxy:port
             - http://proxy:port
         :param bool check_proxy: check if the proxy is working (True)
@@ -55,10 +56,13 @@ class Client:
                         'http://eth0.me/', proxies={'http': self.proxy, 'https': self.proxy}, timeout=10
                     ).text.rstrip()
                     if your_ip not in proxy:
-                        raise exceptions.InvalidProxy(f"Proxy doesn't work! Your IP is {your_ip}.")
+                        raise InvalidProxy(f"Proxy doesn't work! Your IP is {your_ip}.")
+
+            except InvalidProxy:
+                pass
 
             except Exception as e:
-                raise exceptions.InvalidProxy(str(e))
+                raise InvalidProxy(str(e))
 
         self.w3 = Web3(provider=Web3.AsyncHTTPProvider(
             endpoint_uri=self.network.rpc, request_kwargs={'proxy': self.proxy, 'headers': self.headers}
