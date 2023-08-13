@@ -7,7 +7,7 @@ with open(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'README.md'),
 
 setup(
     name='py-eth-async',
-    version='1.8.0',
+    version='1.9.0',
     license='Apache-2.0',
     author='SecorD',
     description='',

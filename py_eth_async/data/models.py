@@ -34,20 +34,24 @@ class API:
     functions: Optional[APIFunctions] = None
 
 
-@dataclass
 class DEX:
     """
     An instance that contains a DEX related information.
 
     Attributes:
         name (str): a DEX name.
-        factory (Optional[str]): a factory contract address.
-        router (Optional[str]): a router contract address.
+        factory (Optional[ChecksumAddress]): a factory contract address.
+        router (Optional[ChecksumAddress]): a router contract address.
 
     """
     name: str
-    factory: Optional[str] = None
-    router: Optional[str] = None
+    factory: Optional[ChecksumAddress]
+    router: Optional[ChecksumAddress]
+
+    def __init__(self, name: str, factory: Optional[str] = None, router: Optional[str] = None) -> None:
+        self.name = name
+        self.factory = checksum(factory) if factory else None
+        self.router = checksum(router) if router else None
 
 
 class Network(AutoRepr):
@@ -333,11 +337,8 @@ class RawContract(AutoRepr):
             abi (Union[List[Dict[str, Any]], str]): an ABI of the contract.
 
         """
-        if isinstance(abi, str):
-            abi = json.loads(abi)
-
         self.address = checksum(address)
-        self.abi = abi
+        self.abi = json.loads(abi) if isinstance(abi, str) else abi
 
 
 @dataclass
@@ -515,10 +516,7 @@ class ABI(AutoRepr):
             abi (Union[List[Dict[str, Any]], str]): an ABI of a contract.
 
         """
-        if isinstance(abi, str):
-            abi = json.loads(abi)
-
-        self.abi = abi
+        self.abi = json.loads(abi) if isinstance(abi, str) else abi
         self.functions = None
 
         self.parse_functions(abi=self.abi)
@@ -571,7 +569,7 @@ class NFT(AutoRepr):
     An instance of a NFT.
 
     Attributes:
-        contract_address (str): a contract address of a NFT collection.
+        contract_address (ChecksumAddress): a contract address of a NFT collection.
         name (Optional[str]): the name of the NFT collection.
         symbol (Optional[str]): the symbol of the NFT collection.
         total_supply (Optional[int]): the total supply of the NFT collection.
@@ -581,7 +579,7 @@ class NFT(AutoRepr):
         attributes (List[NFTAttribute]): a list of NFT attributes.
 
     """
-    contract_address: str
+    contract_address: ChecksumAddress
     name: Optional[str]
     symbol: Optional[str]
     total_supply: Optional[int]
@@ -608,7 +606,7 @@ class NFT(AutoRepr):
             image_url (Optional[str]): an image URL of the NFT with specified ID. (None)
 
         """
-        self.contract_address = contract_address
+        self.contract_address = checksum(contract_address)
         self.name = name
         self.symbol = symbol
         self.total_supply = total_supply
@@ -786,13 +784,18 @@ class RawTxHistory(AutoRepr):
     An instance of a raw transaction history.
 
     Attributes:
-        address (str): an address to which the history belongs.
+        address (ChecksumAddress): an address to which the history belongs.
         coin (List[Dict[str, Any]]): a list of transactions with coin.
         internal (List[Dict[str, Any]]): a list of internal transactions.
         erc20 (List[Dict[str, Any]]): a list of transactions with ERC20 tokens.
         erc721 (List[Dict[str, Any]]): a list of transactions with ERC721 tokens.
 
     """
+    address: ChecksumAddress
+    coin: List[Dict[str, Any]]
+    internal: List[Dict[str, Any]]
+    erc20: List[Dict[str, Any]]
+    erc721: List[Dict[str, Any]]
 
     def __init__(
             self, address: str, coin_txs: List[Dict[str, Any]], internal_txs: List[Dict[str, Any]],
@@ -838,12 +841,17 @@ class TxHistory(AutoRepr):
 
     Attributes:
         address (str): an address to which the history belongs.
-        coin (List[Dict[str, Any]]): a list of transactions with coin.
-        internal (List[Dict[str, Any]]): a list of internal transactions.
-        erc20 (List[Dict[str, Any]]): a list of transactions with ERC20 tokens.
-        erc721 (List[Dict[str, Any]]): a list of transactions with ERC721 tokens.
+        coin (Optional[Txs]): a list of transactions with coin.
+        internal (Optional[Txs]): a list of internal transactions.
+        erc20 (Optional[Txs]): a list of transactions with ERC20 tokens.
+        erc721 (Optional[Txs]): a list of transactions with ERC721 tokens.
 
     """
+    address: ChecksumAddress
+    coin: Optional[Txs]
+    internal: Optional[Txs]
+    erc20: Optional[Txs]
+    erc721: Optional[Txs]
 
     def __init__(
             self, address: str, coin_txs: Optional[list] = None, internal_txs: Optional[list] = None,
