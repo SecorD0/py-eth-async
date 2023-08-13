@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Dict, Any
 
 
 class ClientException(Exception):
@@ -46,7 +46,26 @@ class WalletException(Exception):
 
 
 class HTTPException(Exception):
-    def __init__(self, response: Optional[dict] = None, status_code: Optional[int] = None) -> None:
+    """
+    An exception that occurs when an HTTP request is unsuccessful.
+
+    Attributes:
+        response (Optional[Dict[str, Any]]): a JSON response to a request.
+        status_code (Optional[int]): a request status code.
+
+    """
+    response: Optional[Dict[str, Any]]
+    status_code: Optional[int]
+
+    def __init__(self, response: Optional[Dict[str, Any]] = None, status_code: Optional[int] = None) -> None:
+        """
+        Initialize the class.
+
+        Args:
+            response (Optional[Dict[str, Any]]): a JSON response to a request. (None)
+            status_code (Optional[int]): a request status code. (None)
+
+        """
         self.response = response
         self.status_code = status_code
 

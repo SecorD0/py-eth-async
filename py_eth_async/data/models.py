@@ -19,12 +19,14 @@ from py_eth_async.utils import checksum
 @dataclass
 class API:
     """
-    An API related information.
+    An instance that contains an API related information.
 
-    :param str key: an API-key
-    :param str url: an API entrypoint URL
-    :param str docs: a docs URL
-    :param Optional[APIFunctions] functions: the functions instance (None)
+    Attributes:
+        key (str): an API-key.
+        url (str): an API entrypoint URL.
+        docs (str): a docs URL.
+        functions (Optional[APIFunctions]): the functions instance.
+
     """
     key: str
     url: str
@@ -35,11 +37,13 @@ class API:
 @dataclass
 class DEX:
     """
-    A DEX related information.
+    An instance that contains a DEX related information.
 
-    :param str name: a DEX name
-    :param Optional[str] factory: a factory contract address
-    :param Optional[str] router: a router contract address
+    Attributes:
+        name (str): a DEX name.
+        factory (Optional[str]): a factory contract address.
+        router (Optional[str]): a router contract address.
+
     """
     name: str
     factory: Optional[str] = None
@@ -47,29 +51,56 @@ class DEX:
 
 
 class Network(AutoRepr):
-    def __init__(self, name: str, rpc: str, chain_id: Optional[int] = None, tx_type: int = 0,
-                 coin_symbol: Optional[str] = None, explorer: Optional[str] = None, api: Optional[API] = None,
-                 dex: Optional[DEX] = None) -> None:
-        """
-        A Network instance to use it in the Client.
+    """
+    An instance of a network that is used in the Client.
 
-        :param str name: a network name
-        :param str rpc: the RPC URL
-        :param Optional[int] chain_id: the chain ID (parsed automatically)
-        :param int tx_type: the main type of transactions in the network. Either 0 (legacy) or 2 (EIP-1559). (0)
-        :param Optional[str] coin_symbol: the coin symbol (parsed from the network)
-        :param Optional[str] explorer: the explorer URL (None)
-        :param Optional[API] api: an API instance (None)
-        :param Optional[DEX] dex: a DEX instance (None)
+    Attributes:
+        name (str): a network name.
+        rpc (str): the RPC URL.
+        chain_id (Optional[int]): the chain ID.
+        tx_type (int): the main type of transactions in the network. Either 0 (legacy) or 2 (EIP-1559).
+        coin_symbol (Optional[str]): the coin symbol.
+        explorer (Optional[str]): the explorer URL.
+        api (Optional[API]): an API instance.
+        dex (Optional[DEX]): a DEX instance.
+
+    """
+    name: str
+    rpc: str
+    chain_id: Optional[int]
+    tx_type: int
+    coin_symbol: Optional[str]
+    explorer: Optional[str]
+    api: Optional[API]
+    dex: Optional[DEX]
+
+    def __init__(
+            self, name: str, rpc: str, chain_id: Optional[int] = None, tx_type: int = 0,
+            coin_symbol: Optional[str] = None, explorer: Optional[str] = None, api: Optional[API] = None,
+            dex: Optional[DEX] = None
+    ) -> None:
         """
-        self.name: str = name.lower()
-        self.rpc: str = rpc
-        self.chain_id: Optional[int] = chain_id
-        self.tx_type: int = tx_type
-        self.coin_symbol: Optional[str] = coin_symbol
-        self.explorer: Optional[str] = explorer
-        self.api: Optional[API] = api
-        self.dex: Optional[DEX] = dex
+        Initialize the class.
+
+        Args:
+            name (str): a network name.
+            rpc (str): the RPC URL.
+            chain_id (Optional[int]): the chain ID. (parsed automatically)
+            tx_type (int): the main type of transactions in the network. Either 0 (legacy) or 2 (EIP-1559). (0)
+            coin_symbol (Optional[str]): the coin symbol. (parsed from the network)
+            explorer (Optional[str]): the explorer URL. (None)
+            api (Optional[API]): an API instance. (None)
+            dex (Optional[DEX]): a DEX instance. (None)
+
+        """
+        self.name = name.lower()
+        self.rpc = rpc
+        self.chain_id = chain_id
+        self.tx_type = tx_type
+        self.coin_symbol = coin_symbol
+        self.explorer = explorer
+        self.api = api
+        self.dex = dex
 
         if not self.chain_id:
             try:
@@ -103,15 +134,19 @@ class Network(AutoRepr):
         """
         Compare chain IDs of two networks.
 
-        :param Network network: the second network
-        :return bool: True if chain IDs are equal
+        Args:
+            network (Network): the second network.
+
+        Returns:
+            bool: True if networks are equal.
+
         """
         return self.chain_id == network.chain_id
 
 
 class Networks:
     """
-    The most popular networks.
+    An instance with the most popular networks.
     """
     # Mainnets
     Ethereum = Network(
@@ -278,24 +313,37 @@ class Networks:
 
 
 class RawContract(AutoRepr):
-    def __init__(self, address: str, abi: Union[list, str]) -> None:
-        """
-        A raw contract instance.
+    """
+    An instance of a raw contract.
 
-        :param str address: a contract address
-        :param abi: an ABI of the contract
+    Attributes:
+        address (ChecksumAddress): a contract address.
+        abi (List[Dict[str, Any]]): an ABI of the contract.
+
+    """
+    address: ChecksumAddress
+    abi: List[Dict[str, Any]]
+
+    def __init__(self, address: str, abi: Union[List[Dict[str, Any]], str]) -> None:
+        """
+        Initialize the class.
+
+        Args:
+            address (str): a contract address.
+            abi (Union[List[Dict[str, Any]], str]): an ABI of the contract.
+
         """
         if isinstance(abi, str):
             abi = json.loads(abi)
 
-        self.address: ChecksumAddress = checksum(address)
-        self.abi: list = abi
+        self.address = checksum(address)
+        self.abi = abi
 
 
 @dataclass
 class CommonValues:
     """
-    Common values used in transactions.
+    An instance with common values used in transactions.
     """
     Null: str = '0x0000000000000000000000000000000000000000000000000000000000000000'
     InfinityStr: str = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
@@ -305,7 +353,7 @@ class CommonValues:
 @dataclass
 class DefaultABIs:
     """
-    The default ABIs.
+    An instance with the default ABIs.
     """
     Token = [
         {
@@ -420,10 +468,12 @@ class DefaultABIs:
 @dataclass
 class FunctionArgument:
     """
-    A function argument.
+    An instance of a function argument.
 
-    :param str name: an argument name
-    :param str type: an argument type
+    Attributes:
+        name (str): an argument name.
+        type (str): an argument type.
+
     """
     name: str
     type: str
@@ -432,11 +482,13 @@ class FunctionArgument:
 @dataclass
 class Function:
     """
-    A function instance.
+    An instance of a function.
 
-    :param str name: an argument name
-    :param List[FunctionArgument] inputs: a list of input arguments
-    :param List[FunctionArgument] outputs: a list of output arguments
+    Attributes:
+        name (str): an argument name.
+        inputs (List[FunctionArgument]): a list of input arguments.
+        outputs (List[FunctionArgument]): a list of output arguments.
+
     """
     name: str
     inputs: List[FunctionArgument]
@@ -444,25 +496,40 @@ class Function:
 
 
 class ABI(AutoRepr):
-    def __init__(self, abi: Union[list, str]) -> None:
-        """
-        An ABI instance.
+    """
+    An instance of an ABI.
 
-        :param Union[str, list] abi: an ABI of a contract
+    Attributes:
+        abi (Union[List[Dict[str, Any]], str]): an ABI of a contract.
+        functions (Optional[List[Function]]): a list of function instances.
+
+    """
+    abi: List[Dict[str, Any]]
+    functions: Optional[List[Function]]
+
+    def __init__(self, abi: Union[List[Dict[str, Any]], str]) -> None:
+        """
+        Initialize the class.
+
+        Args:
+            abi (Union[List[Dict[str, Any]], str]): an ABI of a contract.
+
         """
         if isinstance(abi, str):
             abi = json.loads(abi)
 
-        self.abi: list = abi
-        self.functions: Optional[List[Function]] = None
+        self.abi = abi
+        self.functions = None
 
         self.parse_functions(abi=self.abi)
 
-    def parse_functions(self, abi: list) -> None:
+    def parse_functions(self, abi: Union[List[Dict[str, Any]], str]) -> None:
         """
         Convert raw functions to instances.
 
-        :param list abi: an ABI of a contract
+        Args:
+            abi (Union[List[Dict[str, Any]], str]): an ABI of a contract.
+
         """
         if not abi:
             return
@@ -472,13 +539,15 @@ class ABI(AutoRepr):
             function_instance = Function(name=function.get('name'), inputs=[], outputs=[])
             inputs = function.get('inputs')
             if inputs:
-                function_instance.inputs = [FunctionArgument(name=input_.get('name'), type=input_.get('type')) for
-                                            input_ in inputs]
+                function_instance.inputs = [
+                    FunctionArgument(name=input_.get('name'), type=input_.get('type')) for input_ in inputs
+                ]
 
             outputs = function.get('outputs')
             if outputs:
-                function_instance.outputs = [FunctionArgument(name=output.get('name'), type=output.get('type')) for
-                                             output in outputs]
+                function_instance.outputs = [
+                    FunctionArgument(name=output.get('name'), type=output.get('type')) for output in outputs
+                ]
 
             self.functions.append(function_instance)
 
@@ -486,44 +555,75 @@ class ABI(AutoRepr):
 @dataclass
 class NFTAttribute:
     """
-    A NFT attribute.
+    An instance of a NFT attribute.
 
-    :param str name: an attribute name
-    :param Any value: an attribute value
+    Attributes:
+        name (str): an attribute name.
+        value (Any): an attribute value.
+
     """
     name: str
     value: Any
 
 
 class NFT(AutoRepr):
-    def __init__(self, contract_address: str, name: Optional[str] = None, symbol: Optional[str] = None,
-                 total_supply: Optional[int] = None, id: Optional[int] = None, owner: Optional[str] = None,
-                 image_url: Optional[str] = None) -> None:
-        """
-        A NFT instance.
+    """
+    An instance of a NFT.
 
-        :param str contract_address: a contract address of a NFT collection
-        :param Optional[str] name: the name of the NFT collection (None)
-        :param Optional[str] symbol: the symbol of the NFT collection (None)
-        :param Optional[int] total_supply: the total supply of the NFT collection (None)
-        :param Optional[int] id: an NFT ID (None)
-        :param Optional[str] owner: an owner of the NFT with specified ID (None)
-        :param Optional[str] image_url: an image URL of the NFT with specified ID (None)
+    Attributes:
+        contract_address (str): a contract address of a NFT collection.
+        name (Optional[str]): the name of the NFT collection.
+        symbol (Optional[str]): the symbol of the NFT collection.
+        total_supply (Optional[int]): the total supply of the NFT collection.
+        id (Optional[int]): an NFT ID.
+        owner (Optional[str]): an owner of the NFT with specified ID.
+        image_url (Optional[str]): an image URL of the NFT with specified ID.
+        attributes (List[NFTAttribute]): a list of NFT attributes.
+
+    """
+    contract_address: str
+    name: Optional[str]
+    symbol: Optional[str]
+    total_supply: Optional[int]
+    id: Optional[int]
+    owner: Optional[str]
+    image_url: Optional[str]
+    attributes: List[NFTAttribute]
+
+    def __init__(
+            self, contract_address: str, name: Optional[str] = None, symbol: Optional[str] = None,
+            total_supply: Optional[int] = None, id: Optional[int] = None, owner: Optional[str] = None,
+            image_url: Optional[str] = None
+    ) -> None:
         """
-        self.contract_address: str = contract_address
-        self.name: Optional[str] = name
-        self.symbol: Optional[str] = symbol
-        self.total_supply: Optional[int] = total_supply
-        self.id: Optional[int] = id
-        self.owner: Optional[str] = owner
-        self.image_url: Optional[str] = image_url
-        self.attributes: List[NFTAttribute] = []
+        Initialize the class.
+
+        Args:
+            contract_address (str): a contract address of a NFT collection.
+            name (Optional[str]): the name of the NFT collection. (None)
+            symbol (Optional[str]): the symbol of the NFT collection. (None)
+            total_supply (Optional[int]): the total supply of the NFT collection. (None)
+            id (Optional[int]): an NFT ID. (None)
+            owner (Optional[str]): an owner of the NFT with specified ID. (None)
+            image_url (Optional[str]): an image URL of the NFT with specified ID. (None)
+
+        """
+        self.contract_address = contract_address
+        self.name = name
+        self.symbol = symbol
+        self.total_supply = total_supply
+        self.id = id
+        self.owner = owner
+        self.image_url = image_url
+        self.attributes = []
 
     def parse_attributes(self, attributes: Optional[list]) -> None:
         """
         Convert raw attributes to instances.
 
-        :param Optional[list] attributes: a list of attributes
+        Args:
+            attributes (Optional[list]): a list of attributes.
+
         """
         if not attributes:
             return
@@ -539,11 +639,25 @@ class NFT(AutoRepr):
 
 
 class HistoryTx:
+    """
+    An instance of a history transaction.
+    """
     pass
 
 
 class CoinTx(AutoRepr, HistoryTx):
-    def __init__(self, data: dict) -> None:
+    """
+    An instance of a coin transaction.
+    """
+
+    def __init__(self, data: Dict[str, Any]) -> None:
+        """
+        Initialize the class.
+
+        Args:
+            data (Dict[str, Any]): the dictionary with a coin transaction data.
+
+        """
         self.hash: str = data.get('hash')
         self.from_: str = checksum(data.get('from'))
         self.to_: str = checksum(data.get('to'))
@@ -568,7 +682,18 @@ class CoinTx(AutoRepr, HistoryTx):
 
 
 class InternalTx(AutoRepr, HistoryTx):
-    def __init__(self, data: dict) -> None:
+    """
+    An instance of an internal transaction.
+    """
+
+    def __init__(self, data: Dict[str, Any]) -> None:
+        """
+        Initialize the class.
+
+        Args:
+            data (Dict[str, Any]): the dictionary with an internal transaction data.
+
+        """
         self.hash: str = data.get('hash')
         self.from_: str = checksum(data.get('from'))
         self.to_: str = checksum(data.get('to'))
@@ -587,7 +712,18 @@ class InternalTx(AutoRepr, HistoryTx):
 
 
 class ERC20Tx(AutoRepr, HistoryTx):
-    def __init__(self, data: dict) -> None:
+    """
+    An instance of a ERC20 transaction.
+    """
+
+    def __init__(self, data: Dict[str, Any]) -> None:
+        """
+        Initialize the class.
+
+        Args:
+            data (Dict[str, Any]): the dictionary with a ERC20 transaction data.
+
+        """
         self.hash: str = data.get('hash')
         self.from_: str = checksum(data.get('from'))
         self.to_: str = checksum(data.get('to'))
@@ -611,7 +747,18 @@ class ERC20Tx(AutoRepr, HistoryTx):
 
 
 class ERC721Tx(AutoRepr, HistoryTx):
-    def __init__(self, data: dict) -> None:
+    """
+    An instance of a ERC721 transaction.
+    """
+
+    def __init__(self, data: Dict[str, Any]) -> None:
+        """
+        Initialize the class.
+
+        Args:
+            data (Dict[str, Any]): the dictionary with a ERC721 transaction data.
+
+        """
         self.hash: str = data.get('hash')
         self.from_: str = checksum(data.get('from'))
         self.to_: str = checksum(data.get('to'))
@@ -635,22 +782,38 @@ class ERC721Tx(AutoRepr, HistoryTx):
 
 
 class RawTxHistory(AutoRepr):
-    def __init__(self, address: str, coin_txs: List[Dict[str, Any]], internal_txs: List[Dict[str, Any]],
-                 erc20_txs: List[Dict[str, Any]], erc721_txs: List[Dict[str, Any]]) -> None:
-        """
-        A raw transaction history instance.
+    """
+    An instance of a raw transaction history.
 
-        :param str address: an address to which the history belongs
-        :param List[Dict[str, Any]] coin_txs: a list of transactions with coin
-        :param List[Dict[str, Any]] internal_txs: a list of internal transactions
-        :param List[Dict[str, Any]] erc20_txs: a list of transactions ERC20 tokens
-        :param List[Dict[str, Any]] erc721_txs: a list of transactions ERC721 tokens (NFTs)
+    Attributes:
+        address (str): an address to which the history belongs.
+        coin (List[Dict[str, Any]]): a list of transactions with coin.
+        internal (List[Dict[str, Any]]): a list of internal transactions.
+        erc20 (List[Dict[str, Any]]): a list of transactions with ERC20 tokens.
+        erc721 (List[Dict[str, Any]]): a list of transactions with ERC721 tokens.
+
+    """
+
+    def __init__(
+            self, address: str, coin_txs: List[Dict[str, Any]], internal_txs: List[Dict[str, Any]],
+            erc20_txs: List[Dict[str, Any]], erc721_txs: List[Dict[str, Any]]
+    ) -> None:
         """
-        self.address: str = checksum(address)
-        self.coin: List[Dict[str, Any]] = coin_txs
-        self.internal: List[Dict[str, Any]] = internal_txs
-        self.erc20: List[Dict[str, Any]] = erc20_txs
-        self.erc721: List[Dict[str, Any]] = erc721_txs
+        Initialize the class.
+
+        Args:
+            address (str): an address to which the history belongs.
+            coin_txs (List[Dict[str, Any]]): a list of transactions with coin.
+            internal_txs (List[Dict[str, Any]]): a list of internal transactions.
+            erc20_txs (List[Dict[str, Any]]): a list of transactions with ERC20 tokens.
+            erc721_txs (List[Dict[str, Any]]): a list of transactions with ERC721 tokens.
+
+        """
+        self.address = checksum(address)
+        self.coin = coin_txs
+        self.internal = internal_txs
+        self.erc20 = erc20_txs
+        self.erc721 = erc721_txs
 
 
 @dataclass
@@ -658,9 +821,11 @@ class Txs:
     """
     An instance with transactions.
 
-    :param Dict[str, HistoryTx] incoming: a dictionary with incoming transactions
-    :param Dict[str, HistoryTx] outgoing: a dictionary with outgoing transactions
-    :param Dict[str, HistoryTx] all: a dictionary with all transactions
+    Attributes:
+        incoming (Dict[str, HistoryTx]): a dictionary with incoming transactions.
+        outgoing (Dict[str, HistoryTx]): a dictionary with outgoing transactions.
+        all (Dict[str, HistoryTx]): a dictionary with all transactions.
+
     """
     incoming: Dict[str, HistoryTx]
     outgoing: Dict[str, HistoryTx]
@@ -668,22 +833,38 @@ class Txs:
 
 
 class TxHistory(AutoRepr):
-    def __init__(self, address: str, coin_txs: Optional[list] = None, internal_txs: Optional[list] = None,
-                 erc20_txs: Optional[list] = None, erc721_txs: Optional[list] = None) -> None:
-        """
-        A transaction history instance.
+    """
+    An instance of a transaction history.
 
-        :param str address: an address to which the history belongs
-        :param List[Dict[str, Any]] coin_txs: a list of transactions with coin
-        :param List[Dict[str, Any]] internal_txs: a list of internal transactions
-        :param List[Dict[str, Any]] erc20_txs: a list of transactions with ERC20 tokens
-        :param List[Dict[str, Any]] erc721_txs: a list of transactions with ERC721 tokens (NFTs)
+    Attributes:
+        address (str): an address to which the history belongs.
+        coin (List[Dict[str, Any]]): a list of transactions with coin.
+        internal (List[Dict[str, Any]]): a list of internal transactions.
+        erc20 (List[Dict[str, Any]]): a list of transactions with ERC20 tokens.
+        erc721 (List[Dict[str, Any]]): a list of transactions with ERC721 tokens.
+
+    """
+
+    def __init__(
+            self, address: str, coin_txs: Optional[list] = None, internal_txs: Optional[list] = None,
+            erc20_txs: Optional[list] = None, erc721_txs: Optional[list] = None
+    ) -> None:
         """
-        self.address: str = checksum(address)
-        self.coin: Optional[Txs] = None
-        self.internal: Optional[Txs] = None
-        self.erc20: Optional[Txs] = None
-        self.erc721: Optional[Txs] = None
+        Initialize the class.
+
+        Args:
+            address (str): an address to which the history belongs.
+            coin_txs (List[Dict[str, Any]]): a list of transactions with coin.
+            internal_txs (List[Dict[str, Any]]): a list of internal transactions.
+            erc20_txs (List[Dict[str, Any]]): a list of transactions with ERC20 tokens.
+            erc721_txs (List[Dict[str, Any]]): a list of transactions with ERC721 tokens. (NFTs)
+
+        """
+        self.address = checksum(address)
+        self.coin = None
+        self.internal = None
+        self.erc20 = None
+        self.erc721 = None
 
         self.parse_coin_txs(txs=coin_txs)
         self.parse_internal_txs(txs=internal_txs)
@@ -694,7 +875,9 @@ class TxHistory(AutoRepr):
         """
         Convert raw transactions with coin to instances.
 
-        :param Optional[list] txs: a list of transactions with coin
+        Args:
+            txs (Optional[list]): a list of transactions with coin.
+
         """
         if not txs:
             return
@@ -713,7 +896,9 @@ class TxHistory(AutoRepr):
         """
         Convert raw internal transactions to instances.
 
-        :param Optional[list] txs: a list of internal transactions
+        Args:
+            txs (Optional[list]): a list of internal transactions.
+
         """
         if not txs:
             return
@@ -732,7 +917,9 @@ class TxHistory(AutoRepr):
         """
         Convert raw transactions with ERC20 tokens to instances.
 
-        :param Optional[list] txs: a list of transactions with ERC20 tokens
+        Args:
+            txs (Optional[list]): a list of transactions with ERC20 tokens.
+
         """
         if not txs:
             return
@@ -751,7 +938,9 @@ class TxHistory(AutoRepr):
         """
         Convert raw transactions with ERC721 tokens (NFTs) to instances.
 
-        :param Optional[list] txs: a list of transactions with ERC721 tokens (NFTs)
+        Args:
+            txs (Optional[list]): a list of transactions with ERC721 tokens (NFTs).
+
         """
         if not txs:
             return
@@ -768,11 +957,17 @@ class TxHistory(AutoRepr):
 
 
 class TxArgs(AutoRepr):
+    """
+    An instance for named transaction arguments.
+    """
+
     def __init__(self, **kwargs) -> None:
         """
-        An instance for named transaction arguments.
+        Initialize the class.
 
-        :param kwargs: named arguments of a contract transaction
+        Args:
+            **kwargs: named arguments of a contract transaction.
+
         """
         self.__dict__.update(kwargs)
 
@@ -780,7 +975,9 @@ class TxArgs(AutoRepr):
         """
         Get list of transaction arguments.
 
-        :return List[Any]: list of transaction arguments
+        Returns:
+            List[Any]: list of transaction arguments.
+
         """
         return list(self.__dict__.values())
 
@@ -788,32 +985,69 @@ class TxArgs(AutoRepr):
         """
         Get tuple of transaction arguments.
 
-        :return Tuple[Any]: tuple of transaction arguments
+        Returns:
+            Tuple[Any]: tuple of transaction arguments.
+
         """
         return tuple(self.__dict__.values())
 
 
 class Unit(AutoRepr):
+    """
+    An instance of an Ethereum unit.
+
+    Attributes:
+        unit (str): a unit name.
+        decimals (int): a number of decimals.
+        Wei (int): the amount in Wei.
+        KWei (Decimal): the amount in KWei.
+        MWei (Decimal): the amount in MWei.
+        GWei (Decimal): the amount in GWei.
+        Szabo (Decimal): the amount in Szabo.
+        Finney (Decimal): the amount in Finney.
+        Ether (Decimal): the amount in Ether.
+        KEther (Decimal): the amount in KEther.
+        MEther (Decimal): the amount in MEther.
+        GEther (Decimal): the amount in GEther.
+        TEther (Decimal): the amount in TEther.
+
+    """
+    unit: str
+    decimals: int
+    Wei: int
+    KWei: Decimal
+    MWei: Decimal
+    GWei: Decimal
+    Szabo: Decimal
+    Finney: Decimal
+    Ether: Decimal
+    KEther: Decimal
+    MEther: Decimal
+    GEther: Decimal
+    TEther: Decimal
+
     def __init__(self, amount: Union[int, float, str, Decimal], unit: str) -> None:
         """
-        An Ethereum unit.
+        Initialize the class.
 
-        :param Union[int, float, str, Decimal] amount: an amount
-        :param str unit: a unit name
+        Args:
+            amount (Union[int, float, str, Decimal]): an amount.
+            unit (str): a unit name.
+
         """
         self.unit = unit
         self.decimals = 18
-        self.Wei: int = to_wei(amount, self.unit)
-        self.KWei: Decimal = from_wei(self.Wei, 'kwei')
-        self.MWei: Decimal = from_wei(self.Wei, 'mwei')
-        self.GWei: Decimal = from_wei(self.Wei, 'gwei')
-        self.Szabo: Decimal = from_wei(self.Wei, 'szabo')
-        self.Finney: Decimal = from_wei(self.Wei, 'finney')
-        self.Ether: Decimal = from_wei(self.Wei, 'ether')
-        self.KEther: Decimal = from_wei(self.Wei, 'kether')
-        self.MEther: Decimal = from_wei(self.Wei, 'mether')
-        self.GEther: Decimal = from_wei(self.Wei, 'gether')
-        self.TEther: Decimal = from_wei(self.Wei, 'tether')
+        self.Wei = to_wei(amount, self.unit)
+        self.KWei = from_wei(self.Wei, 'kwei')
+        self.MWei = from_wei(self.Wei, 'mwei')
+        self.GWei = from_wei(self.Wei, 'gwei')
+        self.Szabo = from_wei(self.Wei, 'szabo')
+        self.Finney = from_wei(self.Wei, 'finney')
+        self.Ether = from_wei(self.Wei, 'ether')
+        self.KEther = from_wei(self.Wei, 'kether')
+        self.MEther = from_wei(self.Wei, 'mether')
+        self.GEther = from_wei(self.Wei, 'gether')
+        self.TEther = from_wei(self.Wei, 'tether')
 
     def __add__(self, other):
         if isinstance(other, (Unit, TokenAmount)):
@@ -1109,135 +1343,212 @@ class Unit(AutoRepr):
 
 
 class Wei(Unit):
+    """
+    An instance of a Wei unit.
+    """
+
     def __init__(self, amount: Union[int, float, str, Decimal]) -> None:
         """
-        The Wei unit.
+        Initialize the class.
 
-        :param Union[int, float, str, Decimal] amount: an amount
+        Args:
+            amount (Union[int, float, str, Decimal]): an amount.
+
         """
         super().__init__(amount, 'wei')
 
 
 class KWei(Unit):
+    """
+    An instance of a KWei unit.
+    """
+
     def __init__(self, amount: Union[int, float, str, Decimal]) -> None:
         """
-        The KWei unit.
+        Initialize the class.
 
-        :param Union[int, float, str, Decimal] amount: an amount
+        Args:
+            amount (Union[int, float, str, Decimal]): an amount.
+
         """
         super().__init__(amount, 'kwei')
 
 
 class MWei(Unit):
+    """
+    An instance of a MWei unit.
+    """
+
     def __init__(self, amount: Union[int, float, str, Decimal]) -> None:
         """
-        The MWei unit.
+        Initialize the class.
 
-        :param Union[int, float, str, Decimal] amount: an amount
+        Args:
+            amount (Union[int, float, str, Decimal]): an amount.
+
         """
         super().__init__(amount, 'mwei')
 
 
 class GWei(Unit):
+    """
+    An instance of a GWei unit.
+    """
+
     def __init__(self, amount: Union[int, float, str, Decimal]) -> None:
         """
-        The GWei unit.
+        Initialize the class.
 
-        :param Union[int, float, str, Decimal] amount: an amount
+        Args:
+            amount (Union[int, float, str, Decimal]): an amount.
+
         """
         super().__init__(amount, 'gwei')
 
 
 class Szabo(Unit):
+    """
+    An instance of a Szabo unit.
+    """
+
     def __init__(self, amount: Union[int, float, str, Decimal]) -> None:
         """
-        The Szabo unit.
+        Initialize the class.
 
-        :param Union[int, float, str, Decimal] amount: an amount
+        Args:
+            amount (Union[int, float, str, Decimal]): an amount.
+
         """
         super().__init__(amount, 'szabo')
 
 
 class Finney(Unit):
+    """
+    An instance of a Finney unit.
+    """
+
     def __init__(self, amount: Union[int, float, str, Decimal]) -> None:
         """
-        The Finney unit.
+        Initialize the class.
 
-        :param Union[int, float, str, Decimal] amount: an amount
+        Args:
+            amount (Union[int, float, str, Decimal]): an amount.
+
         """
         super().__init__(amount, 'finney')
 
 
 class Ether(Unit):
+    """
+    An instance of an Ether unit.
+    """
+
     def __init__(self, amount: Union[int, float, str, Decimal]) -> None:
         """
-        The Ether unit.
+        Initialize the class.
 
-        :param Union[int, float, str, Decimal] amount: an amount
+        Args:
+            amount (Union[int, float, str, Decimal]): an amount.
+
         """
         super().__init__(amount, 'ether')
 
 
 class KEther(Unit):
+    """
+    An instance of a KEther unit.
+    """
+
     def __init__(self, amount: Union[int, float, str, Decimal]) -> None:
         """
-        The KEther unit.
+        Initialize the class.
 
-        :param Union[int, float, str, Decimal] amount: an amount
+        Args:
+            amount (Union[int, float, str, Decimal]): an amount.
+
         """
         super().__init__(amount, 'kether')
 
 
 class MEther(Unit):
+    """
+    An instance of a MEther unit.
+    """
+
     def __init__(self, amount: Union[int, float, str, Decimal]) -> None:
         """
-        The MEther unit.
+        Initialize the class.
 
-        :param Union[int, float, str, Decimal] amount: an amount
+        Args:
+            amount (Union[int, float, str, Decimal]): an amount.
+
         """
         super().__init__(amount, 'mether')
 
 
 class GEther(Unit):
+    """
+    An instance of a GEther unit.
+    """
+
     def __init__(self, amount: Union[int, float, str, Decimal]) -> None:
         """
-        The GEther unit.
+        Initialize the class.
 
-        :param Union[int, float, str, Decimal] amount: an amount
+        Args:
+            amount (Union[int, float, str, Decimal]): an amount.
+
         """
         super().__init__(amount, 'gether')
 
 
 class TEther(Unit):
+    """
+    An instance of a TEther unit.
+    """
+
     def __init__(self, amount: Union[int, float, str, Decimal]) -> None:
         """
-        The TEther unit.
+        Initialize the class.
 
-        :param Union[int, float, str, Decimal] amount: an amount
+        Args:
+            amount (Union[int, float, str, Decimal]): an amount.
+
         """
         super().__init__(amount, 'tether')
 
 
 class TokenAmount(AutoRepr):
+    """
+    An instance of a token amount.
+
+    Attributes:
+        decimals (int): a number of decimals of the token.
+        Wei (int): the amount in Wei.
+        Ether (Decimal): the amount in Ether.
+
+    """
+    decimals: int
     Wei: int
     Ether: Decimal
-    decimals: int
 
     def __init__(self, amount: Union[int, float, str, Decimal], decimals: int = 18, wei: bool = False) -> None:
         """
-        A token amount instance.
+        Initialize the class.
 
-        :param Union[int, float, str, Decimal] amount: an amount
-        :param int decimals: the decimals of the token (18)
-        :param bool wei: the 'amount' is specified in Wei (False)
+        Args:
+            amount (Union[int, float, str, Decimal]): an amount.
+            decimals (int): the number of decimals of the token. (18)
+            wei (bool): the 'amount' is specified in Wei. (False)
+
         """
         if wei:
-            self.Wei: int = amount
-            self.Ether: Decimal = Decimal(str(amount)) / 10 ** decimals
+            self.Wei = amount
+            self.Ether = Decimal(str(amount)) / 10 ** decimals
 
         else:
-            self.Wei: int = int(Decimal(str(amount)) * 10 ** decimals)
-            self.Ether: Decimal = Decimal(str(amount))
+            self.Wei = int(Decimal(str(amount)) * 10 ** decimals)
+            self.Ether = Decimal(str(amount))
 
         self.decimals = decimals
 
@@ -1245,8 +1556,12 @@ class TokenAmount(AutoRepr):
         """
         Leave the Ether amount and change the Wei based on the new decimals.
 
-        :param int new_decimals: the new decimals
-        :return int: the amount in Wei
+        Args:
+            new_decimals (int): the new number of decimals.
+
+        Returns:
+            int: the amount in Wei.
+
         """
         self.Wei: int = int(self.Ether * 10 ** new_decimals)
         self.decimals = new_decimals

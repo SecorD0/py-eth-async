@@ -17,24 +17,40 @@ from py_eth_async.wallet import Wallet
 
 
 class Client:
+    """
+    The client that is used to interact with all library functions.
+
+    Attributes:
+        network (Network): a network instance.
+        account (Optional[LocalAccount]): imported account.
+        w3 (Web3): a Web3 instance.
+
+    """
     network: Network
     account: Optional[LocalAccount]
     w3: Web3
 
-    def __init__(self, private_key: Optional[str] = None, network: Network = Networks.Goerli,
-                 proxy: Optional[str] = None, check_proxy: bool = True) -> None:
+    def __init__(
+            self, private_key: Optional[str] = None, network: Network = Networks.Goerli, proxy: Optional[str] = None,
+            check_proxy: bool = True
+    ) -> None:
         """
-        Initialize the client that is used to interact with all functions.
+        Initialize the class.
 
-        :param str private_key: a private key of a wallet, specify '' in order not to import the wallet (generate a new one)
-        :param Network network: a network instance (Goerli)
-        :param Optional[str] proxy: an HTTP or SOCKS5 IPv4 proxy in one of the following formats:
-            - login:password@proxy:port
-            - http://login:password@proxy:port
-            - socks5://login:password@proxy:port
-            - proxy:port
-            - http://proxy:port
-        :param bool check_proxy: check if the proxy is working (True)
+        Args:
+            private_key (str): a private key of a wallet, specify '' in order not to import the wallet.
+                (generate a new one)
+            network (Network): a network instance. (Goerli)
+            proxy (Optional[str]): an HTTP or SOCKS5 IPv4 proxy in one of the following formats:
+
+                - login:password@proxy:port
+                - http://login:password@proxy:port
+                - socks5://login:password@proxy:port
+                - proxy:port
+                - http://proxy:port
+
+            check_proxy (bool): check if the proxy is working. (True)
+
         """
         self.network = network
         self.headers = {

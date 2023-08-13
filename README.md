@@ -24,6 +24,8 @@
 <h1><p align="center">Useful links</p></h1>
 <p align="right"><a href="#Content">To the content</a></p>
 
+⠀[web3py](https://github.com/ethereum/web3.py)
+
 ⠀[py-eth-async](https://github.com/SecorD0/py-eth-async)
 
 ⠀[py-eth](https://github.com/SecorD0/py-eth)

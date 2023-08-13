@@ -13,11 +13,21 @@ from py_eth_async.utils import checksum, async_get
 
 
 class Contracts:
+    """
+    Class with functions related to contracts.
+
+    Attributes:
+        client (Client): the Client instance.
+
+    """
+
     def __init__(self, client) -> None:
         """
-        Initialize a class with functions related to contracts.
+        Initialize the class.
 
-        :param Client client: the Client instance
+        Args:
+            client (Client): the Client instance.
+
         """
         self.client = client
 
@@ -26,8 +36,12 @@ class Contracts:
         """
         Find all matching signatures in the database of https://www.4byte.directory/.
 
-        :param str hex_signature: a signature hash
-        :return Optional[list]: matches found
+        Args:
+            hex_signature (str): a signature hash.
+
+        Returns:
+            Optional[list]: matches found.
+
         """
         try:
             response = await async_get(f'https://www.4byte.directory/api/v1/signatures/?hex_signature={hex_signature}')
@@ -42,8 +56,12 @@ class Contracts:
         """
         Construct a function dictionary for the Application Binary Interface (ABI) based on the provided text signature.
 
-        :param str text_signature: a text signature, e.g. approve(address,uint256)
-        :return dict: the function dictionary for the ABI
+        Args:
+            text_signature (str): a text signature, e.g. approve(address,uint256).
+
+        Returns:
+            dict: the function dictionary for the ABI.
+
         """
         name, sign = text_signature.split('(', 1)
         sign = sign[:-1]
@@ -79,22 +97,32 @@ class Contracts:
         """
         Convert different types of contract to its address and ABI.
 
-        :param Contract contract: the contract address or instance
-        :return Tuple[ChecksumAddress, Optional[list]]: the checksummed contract address and ABI
+        Args:
+            contract (Contract): the contract address or instance.
+
+        Returns:
+            Tuple[ChecksumAddress, Optional[list]]: the checksummed contract address and ABI.
+
         """
         if isinstance(contract, (AsyncContract, RawContract)):
             return contract.address, contract.abi
 
         return checksum(contract), None
 
-    async def get_abi(self, contract_address: types.Contract,
-                      raw_json: bool = False) -> Union[str, List[Dict[str, Any]]]:
+    async def get_abi(
+            self, contract_address: types.Contract, raw_json: bool = False
+    ) -> Union[str, List[Dict[str, Any]]]:
         """
-        Get a contract ABI from the Etherscan API, if unsuccessful, parses it based on the contract source code (it may be incorrect or incomplete).
+        Get a contract ABI from the Blockscan API, if unsuccessful, parses it based on the contract source code
+            (it may be incorrect or incomplete).
 
-        :param Contract contract_address: the contract address or instance
-        :param bool raw_json: if True, it returns serialize string, otherwise it returns Python list (False)
-        :return Union[str, List[Dict[str, Any]]]: the ABI
+        Args:
+            contract_address (Contract): the contract address or instance.
+            raw_json (bool): if True, it returns serialize string, otherwise it returns Python list. (False)
+
+        Returns:
+            Union[str, List[Dict[str, Any]]]: the ABI.
+
         """
         contract_address, abi = await self.get_contract_attributes(contract_address)
         abi = []
@@ -146,8 +174,12 @@ class Contracts:
         """
         Get a token contract instance with a standard set of functions.
 
-        :param Contract contract_address: the contract address or instance of token
-        :return AsyncContract: the token contract instance
+        Args:
+            contract_address (Contract): the contract address or instance of token.
+
+        Returns:
+            AsyncContract: the token contract instance.
+
         """
         contract_address, abi = await self.get_contract_attributes(contract_address)
         return self.client.w3.eth.contract(address=contract_address, abi=DefaultABIs.Token)
@@ -156,21 +188,31 @@ class Contracts:
         """
         Get a NFT contract instance with a standard set of functions.
 
-        :param Contract contract_address: the contract address or instance of a NFT collection
-        :return AsyncContract: the NFT contract instance
+        Args:
+            contract_address (Contract): the contract address or instance of a NFT collection.
+
+        Returns:
+            AsyncContract: the NFT contract instance.
+
         """
         contract_address, abi = await self.get_contract_attributes(contract_address)
         return self.client.w3.eth.contract(address=contract_address, abi=DefaultABIs.NFT)
 
-    async def get(self, contract_address: types.Contract, abi: Optional[Union[list, str]] = None,
-                  proxy_address: Optional[types.Contract] = None) -> AsyncContract:
+    async def get(
+            self, contract_address: types.Contract, abi: Optional[Union[list, str]] = None,
+            proxy_address: Optional[types.Contract] = None
+    ) -> AsyncContract:
         """
         Get a contract instance.
 
-        :param Contract contract_address: the contract address or instance
-        :param Optional[Union[list, str]] abi: the contract ABI (get it using the 'get_abi' function)
-        :param Optional[Contract] proxy_address: the contract proxy address (None)
-        :return AsyncContract: the contract instance
+        Args:
+            contract_address (Contract): the contract address or instance.
+            abi (Optional[Union[list, str]]): the contract ABI. (get it using the 'get_abi' function)
+            proxy_address (Optional[Contract]): the contract proxy address. (None)
+
+        Returns:
+            AsyncContract: the contract instance.
+
         """
         contract_address, contract_abi = await self.get_contract_attributes(contract_address)
         if not abi and not contract_abi:
@@ -196,8 +238,12 @@ class Contracts:
         """
         Get functions of a contract in human-readable form.
 
-        :param Contract contract: the contract address or instance
-        :return List[Function]: functions of the contract
+        Args:
+            contract (Contract): the contract address or instance.
+
+        Returns:
+            List[Function]: functions of the contract.
+
         """
         if not isinstance(contract, AsyncContract):
             contract = await self.get(contract_address=contract)

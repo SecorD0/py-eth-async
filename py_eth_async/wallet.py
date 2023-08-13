@@ -8,22 +8,37 @@ from py_eth_async.utils import checksum
 
 
 class Wallet:
+    """
+    Class with functions related to wallet.
+
+    Attributes:
+        client (Client): the Client instance.
+
+    """
+
     def __init__(self, client) -> None:
         """
-        Initialize a class with functions related to wallet.
+        Initialize the class.
 
-        :param Client client: the Client instance
+        Args:
+            client (Client): the Client instance.
+
         """
         self.client = client
 
-    async def balance(self, token: Optional[types.Contract] = None,
-                      address: Optional[types.Address] = None) -> Union[Wei, TokenAmount]:
+    async def balance(
+            self, token: Optional[types.Contract] = None, address: Optional[types.Address] = None
+    ) -> Union[Wei, TokenAmount]:
         """
         Get a coin or token balance of a specified address.
 
-        :param Optional[Contract] token: the contact address or instance of token (coin)
-        :param Optional[Address] address: the address (imported to client address)
-        :return Union[Wei, TokenAmount]: the coin or token balance
+        Args:
+            token (Optional[Contract]): the contact address or instance of token. (coin)
+            address (Optional[Address]): the address. (imported to client address)
+
+        Returns:
+            Union[Wei, TokenAmount]: the coin or token balance.
+
         """
         if not address:
             address = self.client.account.address
@@ -34,15 +49,21 @@ class Wallet:
 
         contract_address, abi = await self.client.contracts.get_contract_attributes(token)
         contract = await self.client.contracts.default_token(contract_address=contract_address)
-        return TokenAmount(amount=await contract.functions.balanceOf(address).call(),
-                           decimals=await contract.functions.decimals().call(), wei=True)
+        return TokenAmount(
+            amount=await contract.functions.balanceOf(address).call(),
+            decimals=await contract.functions.decimals().call(), wei=True
+        )
 
     async def nonce(self, address: Optional[types.Contract] = None) -> int:
         """
         Get a nonce of the specified address.
 
-        :param Optional[Contract] address: the address (imported to client address)
-        :return int: the nonce of the address
+        Args:
+            address (Optional[Contract]): the address. (imported to client address)
+
+        Returns:
+            int: the nonce of the address.
+
         """
         if not address:
             address = self.client.account.address

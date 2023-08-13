@@ -8,38 +8,82 @@ from py_eth_async.utils import async_get
 
 
 class Tag:
+    """
+    An instance with tag values.
+    """
     Earliest: str = 'earliest'
     Pending: str = 'pending'
     Latest: str = 'latest'
 
 
 class Sort:
+    """
+    An instance with sort values.
+    """
     Asc: str = 'asc'
     Desc: str = 'desc'
 
 
 class BlockType:
+    """
+    An instance with block type values.
+    """
     Blocks: str = 'blocks'
     Uncles: str = 'uncles'
 
 
 class Closest:
+    """
+    An instance with closest values.
+    """
     Before: str = 'before'
     After: str = 'after'
 
 
 class ClientType:
+    """
+    An instance with client type values.
+    """
     Geth: str = 'geth'
     Parity: str = 'parity'
 
 
 class SyncMode:
+    """
+    An instance with sync mode values.
+    """
     Default: str = 'default'
     Archive: str = 'archive'
 
 
 class APIFunctions:
+    """
+    Class with functions related to Blockscan API.
+
+    Attributes:
+        key (str): an API key.
+        url (str): an API entrypoint URL.
+        headers (Dict[str, Any]): a headers for requests.
+        account (Account): functions related to 'account' API module.
+        contract (Contract): functions related to 'contract' API module.
+        transaction (Transaction): functions related to 'transaction' API module.
+        block (Block): functions related to 'block' API module.
+        logs (Logs): functions related to 'logs' API module.
+        token (Token): functions related to 'token' API module.
+        gastracker (Gastracker): functions related to 'gastracker' API module.
+        stats (Stats): functions related to 'stats' API module.
+
+    """
+
     def __init__(self, key: str, url: str) -> None:
+        """
+        Initialize the class.
+
+        Args:
+            key (str): an API key.
+            url (str): an API entrypoint URL.
+
+        """
         self.key = key
         self.url = url
         self.headers = {'content-type': 'application/json', 'user-agent': UserAgent().chrome}
@@ -54,7 +98,31 @@ class APIFunctions:
 
 
 class Account:
+    """
+    Class with functions related to 'account' API module.
+
+    Attributes:
+        key (str): an API key.
+        url (str): an API entrypoint URL.
+        headers (Dict[str, Any]): a headers for requests.
+        module (str): a module name.
+
+    """
+    key: str
+    url: str
+    headers: Dict[str, Any]
+    module: str
+
     def __init__(self, key: str, url: str, headers: Dict[str, Any]) -> None:
+        """
+        Initialize the class.
+
+        Args:
+            key (str): an API key.
+            url (str): an API entrypoint URL.
+            headers (Dict[str, Any]): a headers for requests.
+
+        """
         self.key = key
         self.url = url
         self.headers = headers
@@ -66,9 +134,13 @@ class Account:
 
         https://docs.etherscan.io/api-endpoints/accounts#get-ether-balance-for-a-single-address
 
-        :param str address: the address to check for balance
-        :param Union[str, Tag] tag: the pre-defined block parameter, either "earliest", "pending" or "latest" ("latest")
-        :return Dict[str, Any]: the dictionary with the Ether balance of the address in wei
+        Args:
+            address (str): the address to check for balance
+            tag (Union[str, Tag]): the pre-defined block parameter, either "earliest", "pending" or "latest". ("latest")
+
+        Returns:
+            Dict[str, Any]: the dictionary with the Ether balance of the address in wei.
+
         """
         action = 'balance'
         if tag not in ('earliest', 'pending', 'latest'):
@@ -89,9 +161,13 @@ class Account:
 
         https://docs.etherscan.io/api-endpoints/accounts#get-ether-balance-for-multiple-addresses-in-a-single-call
 
-        :param List[str] addresses: the list of up to 20 addresses to check for balance
-        :param Union[str, Tag] tag: the pre-defined block parameter, either "earliest", "pending" or "latest" ("latest")
-        :return Dict[str, Any]: the dictionary with the Ether balances for the addresses in wei
+        Args:
+            addresses (List[str]): the list of up to 20 addresses to check for balance.
+            tag (Union[str, Tag]): the pre-defined block parameter, either "earliest", "pending" or "latest". ("latest")
+
+        Returns:
+            Dict[str, Any]: the dictionary with the Ether balances for the addresses in wei.
+
         """
         action = 'balancemulti'
         if tag not in ('earliest', 'pending', 'latest'):
@@ -106,21 +182,27 @@ class Account:
         }
         return await async_get(self.url, params=aiohttp_params(params), headers=self.headers)
 
-    async def txlist(self, address: str, startblock: Optional[int] = None, endblock: Optional[int] = None,
-                     page: Optional[int] = None, offset: Optional[int] = None,
-                     sort: Union[str, Sort] = Sort.Asc) -> Dict[str, Any]:
+    async def txlist(
+            self, address: str, startblock: Optional[int] = None, endblock: Optional[int] = None,
+            page: Optional[int] = None, offset: Optional[int] = None, sort: Union[str, Sort] = Sort.Asc
+    ) -> Dict[str, Any]:
         """
         Return the list of transactions performed by an address, with optional pagination.
 
         https://docs.etherscan.io/api-endpoints/accounts#get-a-list-of-normal-transactions-by-address
 
-        :param str address: the address to get the transaction list
-        :param Optional[int] startblock: the block number to start searching for transactions
-        :param Optional[int] endblock: the block number to stop searching for transactions
-        :param Optional[int] page: the page number, if pagination is enabled
-        :param Optional[int] offset: the number of transactions displayed per page
-        :param Union[str, Sort] sort: the sorting preference, use "asc" to sort by ascending and "desc" to sort by descending ("asc")
-        :return Dict[str, Any]: the dictionary with the list of transactions performed by the address
+        Args:
+            address (str): the address to get the transaction list.
+            startblock (Optional[int]): the block number to start searching for transactions.
+            endblock (Optional[int]): the block number to stop searching for transactions.
+            page (Optional[int]): the page number, if pagination is enabled.
+            offset (Optional[int]): the number of transactions displayed per page.
+            sort (Union[str, Sort]): the sorting preference, use "asc" to sort by ascending and "desc" to sort
+                by descending. ("asc")
+
+        Returns:
+            Dict[str, Any]: the dictionary with the list of transactions performed by the address.
+
         """
         action = 'txlist'
         if sort not in ('asc', 'desc'):
@@ -140,23 +222,29 @@ class Account:
 
         return await async_get(self.url, params=aiohttp_params(params), headers=self.headers)
 
-    async def txlistinternal(self, address: Optional[str] = None, txhash: Optional[str] = None,
-                             startblock: Optional[int] = None, endblock: Optional[int] = None,
-                             page: Optional[int] = None, offset: Optional[int] = None,
-                             sort: Union[str, Sort] = Sort.Asc) -> Dict[str, Any]:
+    async def txlistinternal(
+            self, address: Optional[str] = None, txhash: Optional[str] = None, startblock: Optional[int] = None,
+            endblock: Optional[int] = None, page: Optional[int] = None, offset: Optional[int] = None,
+            sort: Union[str, Sort] = Sort.Asc
+    ) -> Dict[str, Any]:
         """
         Return the list of internal transactions performed by an address, with optional pagination.
 
         https://docs.etherscan.io/api-endpoints/accounts#get-a-list-of-internal-transactions-by-address
 
-        :param Optional[str] address: the address to get the transaction list
-        :param Optional[str] txhash: the transaction hash to check for internal transactions
-        :param Optional[int] startblock: the block number to start searching for transactions
-        :param Optional[int] endblock: the block number to stop searching for transactions
-        :param Optional[int] page: the page number, if pagination is enabled
-        :param Optional[int] offset: the number of transactions displayed per page
-        :param Union[str, Sort] sort: the sorting preference, use "asc" to sort by ascending and "desc" to sort by descending ("asc")
-        :return Dict[str, Any]: the dictionary with the list of internal transactions performed by the address
+        Args:
+            address (Optional[str]): the address to get the transaction list.
+            txhash (Optional[str]): the transaction hash to check for internal transactions.
+            startblock (Optional[int]): the block number to start searching for transactions.
+            endblock (Optional[int]): the block number to stop searching for transactions.
+            page (Optional[int]): the page number, if pagination is enabled.
+            offset (Optional[int]): the number of transactions displayed per page.
+            sort (Union[str, Sort]): the sorting preference, use "asc" to sort by ascending and "desc" to sort
+                by descending. ("asc")
+
+        Returns:
+            Dict[str, Any]: the dictionary with the list of internal transactions performed by the address.
+
         """
         action = 'txlistinternal'
         if sort not in ('asc', 'desc'):
@@ -191,22 +279,29 @@ class Account:
 
         return await async_get(self.url, params=aiohttp_params(params), headers=self.headers)
 
-    async def tokentx(self, address: str, contractaddress: Optional[str] = None, startblock: Optional[int] = None,
-                      endblock: Optional[int] = None, page: Optional[int] = None, offset: Optional[int] = None,
-                      sort: Union[str, Sort] = Sort.Asc) -> Dict[str, Any]:
+    async def tokentx(
+            self, address: str, contractaddress: Optional[str] = None, startblock: Optional[int] = None,
+            endblock: Optional[int] = None, page: Optional[int] = None, offset: Optional[int] = None,
+            sort: Union[str, Sort] = Sort.Asc
+    ) -> Dict[str, Any]:
         """
         Return the list of ERC-20 tokens transferred by an address, with optional filtering by token contract.
 
         https://docs.etherscan.io/api-endpoints/accounts#get-a-list-of-erc20-token-transfer-events-by-address
 
-        :param str address: the address to get the transaction list
-        :param Optional[str] contractaddress: the token contract address to check for transactions
-        :param Optional[int] startblock: the block number to start searching for transactions
-        :param Optional[int] endblock: the block number to stop searching for transactions
-        :param Optional[int] page: the page number, if pagination is enabled
-        :param Optional[int] offset: the number of transactions displayed per page
-        :param Union[str, Sort] sort: the sorting preference, use "asc" to sort by ascending and "desc" to sort by descending ("asc")
-        :return Dict[str, Any]: the dictionary with the list of ERC-20 token transactions performed by the address
+        Args:
+            address (str): the address to get the transaction list.
+            contractaddress (Optional[str]): the token contract address to check for transactions.
+            startblock (Optional[int]): the block number to start searching for transactions.
+            endblock (Optional[int]): the block number to stop searching for transactions.
+            page (Optional[int]): the page number, if pagination is enabled.
+            offset (Optional[int]): the number of transactions displayed per page.
+            sort (Union[str, Sort]): the sorting preference, use "asc" to sort by ascending and "desc" to sort
+                by descending. ("asc")
+
+        Returns:
+            Dict[str, Any]: the dictionary with the list of ERC-20 token transactions performed by the address.
+
         """
         action = 'tokentx'
         if sort not in ('asc', 'desc'):
@@ -226,22 +321,29 @@ class Account:
         }
         return await async_get(self.url, params=aiohttp_params(params), headers=self.headers)
 
-    async def tokennfttx(self, address: str, contractaddress: Optional[str] = None, startblock: Optional[int] = None,
-                         endblock: Optional[int] = None, page: Optional[int] = None, offset: Optional[int] = None,
-                         sort: Union[str, Sort] = Sort.Asc) -> Dict[str, Any]:
+    async def tokennfttx(
+            self, address: str, contractaddress: Optional[str] = None, startblock: Optional[int] = None,
+            endblock: Optional[int] = None, page: Optional[int] = None, offset: Optional[int] = None,
+            sort: Union[str, Sort] = Sort.Asc
+    ) -> Dict[str, Any]:
         """
         Return the list of ERC-721 (NFT) tokens transferred by an address, with optional filtering by token contract.
 
         https://docs.etherscan.io/api-endpoints/accounts#get-a-list-of-erc721-token-transfer-events-by-address
 
-        :param str address: the address to get the transaction list
-        :param Optional[str] contractaddress: the token contract address to check for transactions
-        :param Optional[int] startblock: the block number to start searching for transactions
-        :param Optional[int] endblock: the block number to stop searching for transactions
-        :param Optional[int] page: the page number, if pagination is enabled
-        :param Optional[int] offset: the number of transactions displayed per page
-        :param Union[str, Sort] sort: the sorting preference, use "asc" to sort by ascending and "desc" to sort by descending ("asc")
-        :return Dict[str, Any]: the dictionary with the list of ERC-721 token transactions performed by the address
+        Args:
+            address (str): the address to get the transaction list.
+            contractaddress (Optional[str]): the token contract address to check for transactions.
+            startblock (Optional[int]): the block number to start searching for transactions.
+            endblock (Optional[int]): the block number to stop searching for transactions.
+            page (Optional[int]): the page number, if pagination is enabled.
+            offset (Optional[int]): the number of transactions displayed per page.
+            sort (Union[str, Sort]): the sorting preference, use "asc" to sort by ascending and "desc" to sort
+                by descending. ("asc")
+
+        Returns:
+            Dict[str, Any]: the dictionary with the list of ERC-721 token transactions performed by the address.
+
         """
         action = 'tokennfttx'
         if sort not in ('asc', 'desc'):
@@ -261,22 +363,29 @@ class Account:
         }
         return await async_get(self.url, params=aiohttp_params(params), headers=self.headers)
 
-    async def token1155tx(self, address: str, contractaddress: Optional[str] = None, startblock: Optional[int] = None,
-                          endblock: Optional[int] = None, page: Optional[int] = None, offset: Optional[int] = None,
-                          sort: Union[str, Sort] = Sort.Asc) -> Dict[str, Any]:
+    async def token1155tx(
+            self, address: str, contractaddress: Optional[str] = None, startblock: Optional[int] = None,
+            endblock: Optional[int] = None, page: Optional[int] = None, offset: Optional[int] = None,
+            sort: Union[str, Sort] = Sort.Asc
+    ) -> Dict[str, Any]:
         """
         Return the list of ERC-1155 (Multi Token Standard) tokens transferred by an address, with optional filtering by token contract.
 
         https://docs.etherscan.io/api-endpoints/accounts#get-a-list-of-erc1155-token-transfer-events-by-address
 
-        :param str address: the address to get the transaction list
-        :param Optional[str] contractaddress: the token contract address to check for transactions
-        :param Optional[int] startblock: the block number to start searching for transactions
-        :param Optional[int] endblock: the block number to stop searching for transactions
-        :param Optional[int] page: the page number, if pagination is enabled
-        :param Optional[int] offset: the number of transactions displayed per page
-        :param Union[str, Sort] sort: the sorting preference, use "asc" to sort by ascending and "desc" to sort by descending ("asc")
-        :return Dict[str, Any]: the dictionary with the list of ERC-1155 token transactions performed by the address
+        Args:
+            address (str): the address to get the transaction list.
+            contractaddress (Optional[str]): the token contract address to check for transactions.
+            startblock (Optional[int]): the block number to start searching for transactions.
+            endblock (Optional[int]): the block number to stop searching for transactions.
+            page (Optional[int]): the page number, if pagination is enabled.
+            offset (Optional[int]): the number of transactions displayed per page.
+            sort (Union[str, Sort]): the sorting preference, use "asc" to sort by ascending and "desc" to sort
+                by descending. ("asc")
+
+        Returns:
+            Dict[str, Any]: the dictionary with the list of ERC-1155 token transactions performed by the address.
+
         """
         action = 'token1155tx'
         if sort not in ('asc', 'desc'):
@@ -296,18 +405,25 @@ class Account:
         }
         return await async_get(self.url, params=aiohttp_params(params), headers=self.headers)
 
-    async def getminedblocks(self, address: str, blocktype: Union[str, BlockType] = BlockType.Blocks,
-                             page: Optional[int] = None, offset: Optional[int] = None) -> Dict[str, Any]:
+    async def getminedblocks(
+            self, address: str, blocktype: Union[str, BlockType] = BlockType.Blocks, page: Optional[int] = None,
+            offset: Optional[int] = None
+    ) -> Dict[str, Any]:
         """
         Return the list of blocks mined by an address.
 
         https://docs.etherscan.io/api-endpoints/accounts#get-list-of-blocks-mined-by-address
 
-        :param str address: the address to check for mined blocks
-        :param Union[str, BlockType] blocktype: the pre-defined block type, either "blocks" for canonical blocks or "uncles" for uncle blocks only ("blocks")
-        :param Optional[int] page: the page number, if pagination is enabled
-        :param Optional[int] offset: the number of transactions displayed per page
-        :return Dict[str, Any]: the dictionary with the list of mined blocks by the address
+        Args:
+            address (str): the address to check for mined blocks.
+            blocktype (Union[str, BlockType]): the pre-defined block type, either "blocks" for canonical blocks
+                or "uncles" for uncle blocks only. ("blocks")
+            page (Optional[int]): the page number, if pagination is enabled.
+            offset (Optional[int]): the number of transactions displayed per page.
+
+        Returns:
+            Dict[str, Any]: the dictionary with the list of mined blocks by the address.
+
         """
         action = 'getminedblocks'
         if blocktype not in ('blocks', 'uncles'):
@@ -330,9 +446,13 @@ class Account:
 
         https://docs.etherscan.io/api-endpoints/accounts#get-historical-ether-balance-for-a-single-address-by-blockno
 
-        :param str address: the address to check for balance
-        :param int blockno: the block number to check balance
-        :return Dict[str, Any]: the dictionary with the Ether balance of the address in wei
+        Args:
+            address (str): the address to check for balance.
+            blockno (int): the block number to check balance.
+
+        Returns:
+            Dict[str, Any]: the dictionary with the Ether balance of the address in wei.
+
         """
         action = 'balancehistory'
         params = {
@@ -350,9 +470,13 @@ class Account:
 
         https://docs.etherscan.io/api-endpoints/tokens#get-erc20-token-account-balance-for-tokencontractaddress
 
-        :param str contractaddress: the contract address of the ERC-20 token
-        :param str address: the address to check for token balance
-        :return Dict[str, Any]: the dictionary with the token balance of the address
+        Args:
+            contractaddress (str): the contract address of the ERC-20 token.
+            address (str): the address to check for token balance.
+
+        Returns:
+            Dict[str, Any]: the dictionary with the token balance of the address.
+
         """
         action = 'tokenbalance'
         params = {
@@ -370,10 +494,14 @@ class Account:
 
         https://docs.etherscan.io/api-endpoints/tokens#get-historical-erc20-token-account-balance-for-tokencontractaddress-by-blockno
 
-        :param str contractaddress: the contract address of the ERC-20 token
-        :param str address: the address to check for balance
-        :param str blockno: the block number to check balance
-        :return Dict[str, Any]: the dictionary with the ERC-20 token balance of the address
+        Args:
+            contractaddress (str): the contract address of the ERC-20 token.
+            address (str): the address to check for balance.
+            blockno (str): the block number to check balance.
+
+        Returns:
+            Dict[str, Any]: the dictionary with the ERC-20 token balance of the address.
+
         """
         action = 'tokenbalancehistory'
         params = {
@@ -386,17 +514,22 @@ class Account:
         }
         return await async_get(self.url, params=aiohttp_params(params), headers=self.headers)
 
-    async def addresstokenbalance(self, address: str, page: Optional[int] = None,
-                                  offset: Optional[int] = None) -> Dict[str, Any]:
+    async def addresstokenbalance(
+            self, address: str, page: Optional[int] = None, offset: Optional[int] = None
+    ) -> Dict[str, Any]:
         """
         Return the ERC-20 tokens and amount held by an address. (PRO)
 
         https://docs.etherscan.io/api-endpoints/tokens#get-address-erc20-token-holding
 
-        :param str address: the address to check for balance
-        :param Optional[int] page: the page number, if pagination is enabled
-        :param Optional[int] offset: the number of transactions displayed per page
-        :return Dict[str, Any]: the dictionary with the ERC-20 tokens and amount held by an address
+        Args:
+            address (str): the address to check for balance.
+            page (Optional[int]): the page number, if pagination is enabled.
+            offset (Optional[int]): the number of transactions displayed per page.
+
+        Returns:
+            Dict[str, Any]: the dictionary with the ERC-20 tokens and amount held by an address.
+
         """
         action = 'addresstokenbalance'
         params = {
@@ -409,17 +542,22 @@ class Account:
         }
         return await async_get(self.url, params=aiohttp_params(params), headers=self.headers)
 
-    async def addresstokennftbalance(self, address: str, page: Optional[int] = None,
-                                     offset: Optional[int] = None) -> Dict[str, Any]:
+    async def addresstokennftbalance(
+            self, address: str, page: Optional[int] = None, offset: Optional[int] = None
+    ) -> Dict[str, Any]:
         """
         Return the ERC-721 tokens and amount held by an address. (PRO)
 
         https://docs.etherscan.io/api-endpoints/tokens#get-address-erc721-token-holding
 
-        :param str address: the address to check for balance
-        :param Optional[int] page: the page number, if pagination is enabled
-        :param Optional[int] offset: the number of transactions displayed per page
-        :return Dict[str, Any]: the dictionary with the ERC-721 tokens and amount held by an address.
+        Args:
+            address (str): the address to check for balance.
+            page (Optional[int]): the page number, if pagination is enabled.
+            offset (Optional[int]): the number of transactions displayed per page.
+
+        Returns:
+            Dict[str, Any]: the dictionary with the ERC-721 tokens and amount held by an address..
+
         """
         action = 'addresstokennftbalance'
         params = {
@@ -432,17 +570,22 @@ class Account:
         }
         return await async_get(self.url, params=aiohttp_params(params), headers=self.headers)
 
-    async def addresstokennftinventory(self, address: str, page: Optional[int] = None,
-                                       offset: Optional[int] = None) -> Dict[str, Any]:
+    async def addresstokennftinventory(
+            self, address: str, page: Optional[int] = None, offset: Optional[int] = None
+    ) -> Dict[str, Any]:
         """
         Return the ERC-721 token inventory of an address, filtered by contract address. (PRO)
 
         https://docs.etherscan.io/api-endpoints/tokens#get-address-erc721-token-inventory-by-contract-address
 
-        :param str address: the address to check for balance
-        :param Optional[int] page: the page number, if pagination is enabled
-        :param Optional[int] offset: the number of transactions displayed per page
-        :return Dict[str, Any]: the dictionary with the ERC-721 tokens and amount held by an address.
+        Args:
+            address (str): the address to check for balance.
+            page (Optional[int]): the page number, if pagination is enabled.
+            offset (Optional[int]): the number of transactions displayed per page.
+
+        Returns:
+            Dict[str, Any]: the dictionary with the ERC-721 tokens and amount held by an address..
+
         """
         action = 'addresstokennftinventory'
         params = {
@@ -457,7 +600,31 @@ class Account:
 
 
 class Contract:
+    """
+    Class with functions related to 'contract' API module.
+
+    Attributes:
+        key (str): an API key.
+        url (str): an API entrypoint URL.
+        headers (Dict[str, Any]): a headers for requests.
+        module (str): a module name.
+
+    """
+    key: str
+    url: str
+    headers: Dict[str, Any]
+    module: str
+
     def __init__(self, key: str, url: str, headers: Dict[str, Any]) -> None:
+        """
+        Initialize the class.
+
+        Args:
+            key (str): an API key.
+            url (str): an API entrypoint URL.
+            headers (Dict[str, Any]): a headers for requests.
+
+        """
         self.key = key
         self.url = url
         self.headers = headers
@@ -469,8 +636,12 @@ class Contract:
 
         https://docs.etherscan.io/api-endpoints/contracts#get-contract-abi-for-verified-contract-source-codes
 
-        :param str address: the contract address that has a verified source code
-        :return Dict[str, Any]: the dictionary with the contract ABI
+        Args:
+            address (str): the contract address that has a verified source code.
+
+        Returns:
+            Dict[str, Any]: the dictionary with the contract ABI.
+
         """
         action = 'getabi'
         params = {
@@ -487,8 +658,12 @@ class Contract:
 
         https://docs.etherscan.io/api-endpoints/contracts#get-contract-source-code-for-verified-contract-source-codes
 
-        :param str address: the contract address that has a verified source code
-        :return Dict[str, Any]: the dictionary with the contract source code
+        Args:
+            address (str): the contract address that has a verified source code.
+
+        Returns:
+            Dict[str, Any]: the dictionary with the contract source code.
+
         """
         action = 'getsourcecode'
         params = {
@@ -505,8 +680,12 @@ class Contract:
 
         https://docs.etherscan.io/api-endpoints/contracts#get-contract-creator-and-creation-tx-hash
 
-        :param str addresses: the contract address, up to 5 at a time
-        :return Dict[str, Any]: the dictionary with a contract's deployer address and transaction hash it was created
+        Args:
+            addresses (str): the contract address, up to 5 at a time.
+
+        Returns:
+            Dict[str, Any]: the dictionary with a contract's deployer address and transaction hash it was created.
+
         """
         action = 'getcontractcreation'
         params = {
@@ -519,7 +698,31 @@ class Contract:
 
 
 class Transaction:
+    """
+    Class with functions related to 'transaction' API module.
+
+    Attributes:
+        key (str): an API key.
+        url (str): an API entrypoint URL.
+        headers (Dict[str, Any]): a headers for requests.
+        module (str): a module name.
+
+    """
+    key: str
+    url: str
+    headers: Dict[str, Any]
+    module: str
+
     def __init__(self, key: str, url: str, headers: Dict[str, Any]) -> None:
+        """
+        Initialize the class.
+
+        Args:
+            key (str): an API key.
+            url (str): an API entrypoint URL.
+            headers (Dict[str, Any]): a headers for requests.
+
+        """
         self.key = key
         self.url = url
         self.headers = headers
@@ -531,8 +734,12 @@ class Transaction:
 
         https://docs.etherscan.io/api-endpoints/stats#check-contract-execution-status
 
-        :param str txhash: the transaction hash to check the execution status
-        :return Dict[str, Any]: the dictionary with the contract status code
+        Args:
+            txhash (str): the transaction hash to check the execution status.
+
+        Returns:
+            Dict[str, Any]: the dictionary with the contract status code.
+
         """
         action = 'getstatus'
         params = {
@@ -549,8 +756,12 @@ class Transaction:
 
         https://docs.etherscan.io/api-endpoints/stats#check-transaction-receipt-status
 
-        :param str txhash: the transaction hash to check the execution status
-        :return Dict[str, Any]: the dictionary with the transaction status code
+        Args:
+            txhash (str): the transaction hash to check the execution status.
+
+        Returns:
+            Dict[str, Any]: the dictionary with the transaction status code.
+
         """
         action = 'gettxreceiptstatus'
         params = {
@@ -563,7 +774,31 @@ class Transaction:
 
 
 class Block:
+    """
+    Class with functions related to 'block' API module.
+
+    Attributes:
+        key (str): an API key.
+        url (str): an API entrypoint URL.
+        headers (Dict[str, Any]): a headers for requests.
+        module (str): a module name.
+
+    """
+    key: str
+    url: str
+    headers: Dict[str, Any]
+    module: str
+
     def __init__(self, key: str, url: str, headers: Dict[str, Any]) -> None:
+        """
+        Initialize the class.
+
+        Args:
+            key (str): an API key.
+            url (str): an API entrypoint URL.
+            headers (Dict[str, Any]): a headers for requests.
+
+        """
         self.key = key
         self.url = url
         self.headers = headers
@@ -575,8 +810,12 @@ class Block:
 
         https://docs.etherscan.io/api-endpoints/blocks#get-block-and-uncle-rewards-by-blockno
 
-        :param int blockno: the block number to check block rewards
-        :return Dict[str, Any]: the dictionary with the block rewards
+        Args:
+            blockno (int): the block number to check block rewards.
+
+        Returns:
+            Dict[str, Any]: the dictionary with the block rewards.
+
         """
         action = 'getblockreward'
         params = {
@@ -593,8 +832,12 @@ class Block:
 
         https://docs.etherscan.io/api-endpoints/blocks#get-estimated-block-countdown-time-by-blockno
 
-        :param int blockno: the block number to estimate time remaining to be mined
-        :return Dict[str, Any]: the dictionary with the estimated time remaining until a certain block is mined
+        Args:
+            blockno (int): the block number to estimate time remaining to be mined.
+
+        Returns:
+            Dict[str, Any]: the dictionary with the estimated time remaining until a certain block is mined.
+
         """
         action = 'getblockcountdown'
         params = {
@@ -611,9 +854,14 @@ class Block:
 
         https://docs.etherscan.io/api-endpoints/blocks#get-block-number-by-timestamp
 
-        :param str timestamp: the Unix timestamp in seconds
-        :param Union[str, Closest] closest: the closest available block to the provided timestamp, either "before" or "after" ("before")
-        :return Dict[str, Any]: the dictionary with the block number that was mined at a certain timestamp
+        Args:
+            timestamp (str): the Unix timestamp in seconds.
+            closest (Union[str, Closest]): the closest available block to the provided timestamp,
+                either "before" or "after". ("before")
+
+        Returns:
+            Dict[str, Any]: the dictionary with the block number that was mined at a certain timestamp.
+
         """
         action = 'getblocknobytime'
         if closest not in ('before', 'after'):
@@ -630,26 +878,56 @@ class Block:
 
 
 class Logs:
+    """
+    Class with functions related to 'logs' API module.
+
+    Attributes:
+        key (str): an API key.
+        url (str): an API entrypoint URL.
+        headers (Dict[str, Any]): a headers for requests.
+        module (str): a module name.
+
+    """
+    key: str
+    url: str
+    headers: Dict[str, Any]
+    module: str
+
     def __init__(self, key: str, url: str, headers: Dict[str, Any]) -> None:
+        """
+        Initialize the class.
+
+        Args:
+            key (str): an API key.
+            url (str): an API entrypoint URL.
+            headers (Dict[str, Any]): a headers for requests.
+
+        """
         self.key = key
         self.url = url
         self.headers = headers
         self.module = 'log'
 
-    async def getLogs(self, address: Optional[str], fromBlock: Optional[int], toBlock: Optional[int],
-                      page: Optional[int] = None, offset: Optional[int] = None, **kwargs) -> Dict[str, Any]:
+    async def getLogs(
+            self, address: Optional[str], fromBlock: Optional[int], toBlock: Optional[int], page: Optional[int] = None,
+            offset: Optional[int] = None, **kwargs
+    ) -> Dict[str, Any]:
         """
         Return the event logs from an address, with optional filtering by block range.
 
         https://docs.etherscan.io/api-endpoints/logs#get-event-logs-by-address
 
-        :param Optional[str] address: the address to get the transaction list
-        :param Optional[int] fromBlock: the block number to start searching for logs
-        :param Optional[int] toBlock: the block number to stop searching for logs
-        :param Optional[int] page: the page number, if pagination is enabled
-        :param Optional[int] offset: the number of transactions displayed per page
-        :param kwargs: the topic numbers to search for and the topic operator when multiple topic combinations are used
-        :return Dict[str, Any]: the dictionary with the list of transactions performed by the address
+        Args:
+            address (Optional[str]): the address to get the transaction list.
+            fromBlock (Optional[int]): the block number to start searching for logs.
+            toBlock (Optional[int]): the block number to stop searching for logs.
+            page (Optional[int]): the page number, if pagination is enabled.
+            offset (Optional[int]): the number of transactions displayed per page.
+            **kwargs: the topic numbers to search for and the topic operator when multiple topic combinations are used.
+
+        Returns:
+            Dict[str, Any]: the dictionary with the list of transactions performed by the address.
+
         """
         action = 'getLogs'
         params = {
@@ -669,23 +947,53 @@ class Logs:
 
 
 class Token:
+    """
+    Class with functions related to 'token' API module.
+
+    Attributes:
+        key (str): an API key.
+        url (str): an API entrypoint URL.
+        headers (Dict[str, Any]): a headers for requests.
+        module (str): a module name.
+
+    """
+    key: str
+    url: str
+    headers: Dict[str, Any]
+    module: str
+
     def __init__(self, key: str, url: str, headers: Dict[str, Any]) -> None:
+        """
+        Initialize the class.
+
+        Args:
+            key (str): an API key.
+            url (str): an API entrypoint URL.
+            headers (Dict[str, Any]): a headers for requests.
+
+        """
         self.key = key
         self.url = url
         self.headers = headers
         self.module = 'token'
 
-    async def tokenholderlist(self, contractaddress: str, page: Optional[int] = None,
-                              offset: Optional[int] = None) -> Dict[str, Any]:
+    async def tokenholderlist(
+            self, contractaddress: str, page: Optional[int] = None, offset: Optional[int] = None
+    ) -> Dict[str, Any]:
         """
         Return project information and social media links of an ERC20/ERC721/ERC1155 token. (PRO)
 
         https://docs.etherscan.io/api-endpoints/tokens#get-token-holder-list-by-contract-address
 
-        :param str contractaddress: the contract address of the ERC-20 token
-        :param Optional[int] page: the page number, if pagination is enabled
-        :param Optional[int] offset: the number of transactions displayed per page
-        :return Dict[str, Any]: the dictionary with the project information and social media links of an ERC20/ERC721/ERC1155 token
+        Args:
+            contractaddress (str): the contract address of the ERC-20 token.
+            page (Optional[int]): the page number, if pagination is enabled.
+            offset (Optional[int]): the number of transactions displayed per page.
+
+        Returns:
+            Dict[str, Any]: the dictionary with the project information and social media links of
+                an ERC20/ERC721/ERC1155 token.
+
         """
         action = 'tokenholderlist'
         params = {
@@ -704,8 +1012,13 @@ class Token:
 
         https://docs.etherscan.io/api-endpoints/tokens#get-token-info-by-contractaddress
 
-        :param str contractaddress: the contract address of the ERC-20 token
-        :return Dict[str, Any]: the dictionary with the project information and social media links of an ERC20/ERC721/ERC1155 token
+        Args:
+            contractaddress (str): the contract address of the ERC-20 token.
+
+        Returns:
+            Dict[str, Any]: the dictionary with the project information and social media links of
+                an ERC20/ERC721/ERC1155 token.
+
         """
         action = 'tokeninfo'
         params = {
@@ -718,7 +1031,31 @@ class Token:
 
 
 class Gastracker:
+    """
+    Class with functions related to 'gastracker' API module.
+
+    Attributes:
+        key (str): an API key.
+        url (str): an API entrypoint URL.
+        headers (Dict[str, Any]): a headers for requests.
+        module (str): a module name.
+
+    """
+    key: str
+    url: str
+    headers: Dict[str, Any]
+    module: str
+
     def __init__(self, key: str, url: str, headers: Dict[str, Any]) -> None:
+        """
+        Initialize the class.
+
+        Args:
+            key (str): an API key.
+            url (str): an API entrypoint URL.
+            headers (Dict[str, Any]): a headers for requests.
+
+        """
         self.key = key
         self.url = url
         self.headers = headers
@@ -730,8 +1067,13 @@ class Gastracker:
 
         https://docs.etherscan.io/api-endpoints/gas-tracker#get-estimation-of-confirmation-time
 
-        :param int gasprice: the price paid per unit of gas, in wei
-        :return Dict[str, Any]: the dictionary with the estimated time, in seconds, for a transaction to be confirmed on the blockchain
+        Args:
+            gasprice (int): the price paid per unit of gas, in wei.
+
+        Returns:
+            Dict[str, Any]: the dictionary with the estimated time, in seconds, for a transaction to be confirmed
+                on the blockchain.
+
         """
         action = 'gasestimate'
         params = {
@@ -748,7 +1090,9 @@ class Gastracker:
 
         https://docs.etherscan.io/api-endpoints/gas-tracker#get-gas-oracle
 
-        :return Dict[str, Any]: the dictionary with the current Safe, Proposed and Fast gas prices
+        Returns:
+            Dict[str, Any]: the dictionary with the current Safe, Proposed and Fast gas prices.
+
         """
         action = 'gasoracle'
         params = {
@@ -760,7 +1104,31 @@ class Gastracker:
 
 
 class Stats:
+    """
+    Class with functions related to 'stats' API module.
+
+    Attributes:
+        key (str): an API key.
+        url (str): an API entrypoint URL.
+        headers (Dict[str, Any]): a headers for requests.
+        module (str): a module name.
+
+    """
+    key: str
+    url: str
+    headers: Dict[str, Any]
+    module: str
+
     def __init__(self, key: str, url: str, headers: Dict[str, Any]) -> None:
+        """
+        Initialize the class.
+
+        Args:
+            key (str): an API key.
+            url (str): an API entrypoint URL.
+            headers (Dict[str, Any]): a headers for requests.
+
+        """
         self.key = key
         self.url = url
         self.headers = headers
@@ -772,7 +1140,9 @@ class Stats:
 
         https://docs.etherscan.io/api-endpoints/stats-1#get-total-supply-of-ether
 
-        :return Dict[str, Any]: the dictionary with the current amount of Ether
+        Returns:
+            Dict[str, Any]: the dictionary with the current amount of Ether.
+
         """
         action = 'ethsupply'
         params = {
@@ -788,7 +1158,9 @@ class Stats:
 
         https://docs.etherscan.io/api-endpoints/stats-1#get-total-supply-of-ether-2
 
-        :return Dict[str, Any]: the dictionary with the current amount of Ether
+        Returns:
+            Dict[str, Any]: the dictionary with the current amount of Ether.
+
         """
         action = 'ethsupply2'
         params = {
@@ -804,7 +1176,9 @@ class Stats:
 
         https://docs.etherscan.io/api-endpoints/stats-1#get-ether-last-price
 
-        :return Dict[str, Any]: the dictionary with the latest Ether price
+        Returns:
+            Dict[str, Any]: the dictionary with the latest Ether price.
+
         """
         action = 'ethprice'
         params = {
@@ -814,20 +1188,26 @@ class Stats:
         }
         return await async_get(self.url, params=aiohttp_params(params), headers=self.headers)
 
-    async def chainsize(self, startdate: str, enddate: str, clienttype: Union[str, ClientType] = ClientType.Geth,
-                        syncmode: Union[str, SyncMode] = SyncMode.Default,
-                        sort: Union[str, Sort] = Sort.Asc) -> Dict[str, Any]:
+    async def chainsize(
+            self, startdate: str, enddate: str, clienttype: Union[str, ClientType] = ClientType.Geth,
+            syncmode: Union[str, SyncMode] = SyncMode.Default, sort: Union[str, Sort] = Sort.Asc
+    ) -> Dict[str, Any]:
         """
         Return the size of the Ethereum blockchain, in bytes, over a date range.
 
         https://docs.etherscan.io/api-endpoints/stats-1#get-ethereum-nodes-size
 
-        :param str startdate: the starting date in yyyy-MM-dd format, eg. 2019-02-01
-        :param int enddate: the ending date in yyyy-MM-dd format, eg. 2019-02-28
-        :param Union[str, ClientType] clienttype: the Ethereum node client to use, either "geth" or "parity" ("geth")
-        :param Union[str, SyncMode] syncmode: the type of node to run, either "default" or "archive" ("default")
-        :param Union[str, Sort] sort: the sorting preference, use "asc" to sort by ascending and "desc" to sort by descending ("asc")
-        :return Dict[str, Any]: the dictionary with the list of transactions performed by the address
+        Args:
+            startdate (str): the starting date in yyyy-MM-dd format, eg. 2019-02-01.
+            enddate (int): the ending date in yyyy-MM-dd format, eg. 2019-02-28.
+            clienttype (Union[str, ClientType]): the Ethereum node client to use, either "geth" or "parity". ("geth")
+            syncmode (Union[str, SyncMode]): the type of node to run, either "default" or "archive". ("default")
+            sort (Union[str, Sort]): the sorting preference, use "asc" to sort by ascending and "desc" to sort
+                by descending. ("asc")
+
+        Returns:
+            Dict[str, Any]: the dictionary with the list of transactions performed by the address.
+
         """
         action = 'chainsize'
         if clienttype not in ('geth', 'parity'):
@@ -857,7 +1237,9 @@ class Stats:
 
         https://docs.etherscan.io/api-endpoints/stats-1#get-total-nodes-count
 
-        :return Dict[str, Any]: the dictionary with the total number of discoverable Ethereum nodes
+        Returns:
+            Dict[str, Any]: the dictionary with the total number of discoverable Ethereum nodes.
+
         """
         action = 'nodecount'
         params = {
@@ -867,16 +1249,22 @@ class Stats:
         }
         return await async_get(self.url, params=aiohttp_params(params), headers=self.headers)
 
-    async def general(self, action: str, startdate: str, enddate: str,
-                      sort: Union[str, Sort] = Sort.Asc) -> Dict[str, Any]:
+    async def general(
+            self, action: str, startdate: str, enddate: str, sort: Union[str, Sort] = Sort.Asc
+    ) -> Dict[str, Any]:
         """
         Function for sending similar requests.
 
-        :param str action: the action name
-        :param str startdate: the starting date in yyyy-MM-dd format, eg. 2019-02-01
-        :param str enddate: the ending date in yyyy-MM-dd format, eg. 2019-02-28
-        :param Union[str, Sort] sort: the sorting preference, use "asc" to sort by ascending and "desc" to sort by descending ("asc")
-        :return Dict[str, Any]: the dictionary with the data
+        Args:
+            action (str): the action name.
+            startdate (str): the starting date in yyyy-MM-dd format, eg. 2019-02-01.
+            enddate (str): the ending date in yyyy-MM-dd format, eg. 2019-02-28.
+            sort (Union[str, Sort]): the sorting preference, use "asc" to sort by ascending and "desc" to sort
+                by descending. ("asc")
+
+        Returns:
+            Dict[str, Any]: the dictionary with the data.
+
         """
         if sort not in ('asc', 'desc'):
             raise exceptions.APIException('"sort" parameter have to be either "asc" or "desc"')
@@ -897,10 +1285,15 @@ class Stats:
 
         https://docs.etherscan.io/api-endpoints/stats-1#get-daily-network-transaction-fee
 
-        :param str startdate: the starting date in yyyy-MM-dd format, eg. 2019-02-01
-        :param str enddate: the ending date in yyyy-MM-dd format, eg. 2019-02-28
-        :param Union[str, Sort] sort: the sorting preference, use "asc" to sort by ascending and "desc" to sort by descending ("asc")
-        :return Dict[str, Any]: the dictionary with the amount of transaction fees paid to miners per day
+        Args:
+            startdate (str): the starting date in yyyy-MM-dd format, eg. 2019-02-01.
+            enddate (str): the ending date in yyyy-MM-dd format, eg. 2019-02-28.
+            sort (Union[str, Sort]): the sorting preference, use "asc" to sort by ascending and "desc" to sort
+                by descending. ("asc")
+
+        Returns:
+            Dict[str, Any]: the dictionary with the amount of transaction fees paid to miners per day.
+
         """
         return await self.general(action='dailytxnfee', startdate=startdate, enddate=enddate, sort=sort)
 
@@ -910,24 +1303,35 @@ class Stats:
 
         https://docs.etherscan.io/api-endpoints/stats-1#get-daily-new-address-count
 
-        :param str startdate: the starting date in yyyy-MM-dd format, eg. 2019-02-01
-        :param str enddate: the ending date in yyyy-MM-dd format, eg. 2019-02-28
-        :param Union[str, Sort] sort: the sorting preference, use "asc" to sort by ascending and "desc" to sort by descending ("asc")
-        :return Dict[str, Any]: the dictionary with the number of new Ethereum addresses created per day
+        Args:
+            startdate (str): the starting date in yyyy-MM-dd format, eg. 2019-02-01.
+            enddate (str): the ending date in yyyy-MM-dd format, eg. 2019-02-28.
+            sort (Union[str, Sort]): the sorting preference, use "asc" to sort by ascending and "desc" to sort
+                by descending. ("asc")
+
+        Returns:
+            Dict[str, Any]: the dictionary with the number of new Ethereum addresses created per day.
+
         """
         return await self.general(action='dailynewaddress', startdate=startdate, enddate=enddate, sort=sort)
 
-    async def dailynetutilization(self, startdate: str, enddate: str,
-                                  sort: Union[str, Sort] = Sort.Asc) -> Dict[str, Any]:
+    async def dailynetutilization(
+            self, startdate: str, enddate: str, sort: Union[str, Sort] = Sort.Asc
+    ) -> Dict[str, Any]:
         """
         Return the daily average gas used over gas limit, in percentage. (PRO)
 
         https://docs.etherscan.io/api-endpoints/stats-1#get-daily-new-address-count
 
-        :param str startdate: the starting date in yyyy-MM-dd format, eg. 2019-02-01
-        :param str enddate: the ending date in yyyy-MM-dd format, eg. 2019-02-28
-        :param Union[str, Sort] sort: the sorting preference, use "asc" to sort by ascending and "desc" to sort by descending ("asc")
-        :return Dict[str, Any]: the dictionary with the daily average gas used over gas limit
+        Args:
+            startdate (str): the starting date in yyyy-MM-dd format, eg. 2019-02-01.
+            enddate (str): the ending date in yyyy-MM-dd format, eg. 2019-02-28.
+            sort (Union[str, Sort]): the sorting preference, use "asc" to sort by ascending and "desc" to sort
+                by descending. ("asc")
+
+        Returns:
+            Dict[str, Any]: the dictionary with the daily average gas used over gas limit.
+
         """
         return await self.general(action='dailynetutilization', startdate=startdate, enddate=enddate, sort=sort)
 
@@ -937,10 +1341,15 @@ class Stats:
 
         https://docs.etherscan.io/api-endpoints/stats-1#get-daily-average-network-hash-rate
 
-        :param str startdate: the starting date in yyyy-MM-dd format, eg. 2019-02-01
-        :param str enddate: the ending date in yyyy-MM-dd format, eg. 2019-02-28
-        :param Union[str, Sort] sort: the sorting preference, use "asc" to sort by ascending and "desc" to sort by descending ("asc")
-        :return Dict[str, Any]: the dictionary with the historical measure of processing power
+        Args:
+            startdate (str): the starting date in yyyy-MM-dd format, eg. 2019-02-01.
+            enddate (str): the ending date in yyyy-MM-dd format, eg. 2019-02-28.
+            sort (Union[str, Sort]): the sorting preference, use "asc" to sort by ascending and "desc" to sort
+                by descending. ("asc")
+
+        Returns:
+            Dict[str, Any]: the dictionary with the historical measure of processing power.
+
         """
         return await self.general(action='dailyavghashrate', startdate=startdate, enddate=enddate, sort=sort)
 
@@ -950,38 +1359,55 @@ class Stats:
 
         https://docs.etherscan.io/api-endpoints/stats-1#get-daily-transaction-count
 
-        :param str startdate: the starting date in yyyy-MM-dd format, eg. 2019-02-01
-        :param str enddate: the ending date in yyyy-MM-dd format, eg. 2019-02-28
-        :param Union[str, Sort] sort: the sorting preference, use "asc" to sort by ascending and "desc" to sort by descending ("asc")
-        :return Dict[str, Any]: the dictionary with the number of transactions performed per day
+        Args:
+            startdate (str): the starting date in yyyy-MM-dd format, eg. 2019-02-01.
+            enddate (str): the ending date in yyyy-MM-dd format, eg. 2019-02-28.
+            sort (Union[str, Sort]): the sorting preference, use "asc" to sort by ascending and "desc" to sort
+                by descending. ("asc")
+
+        Returns:
+            Dict[str, Any]: the dictionary with the number of transactions performed per day.
+
         """
         return await self.general(action='dailytx', startdate=startdate, enddate=enddate, sort=sort)
 
-    async def dailyavgnetdifficulty(self, startdate: str, enddate: str,
-                                    sort: Union[str, Sort] = Sort.Asc) -> Dict[str, Any]:
+    async def dailyavgnetdifficulty(
+            self, startdate: str, enddate: str, sort: Union[str, Sort] = Sort.Asc
+    ) -> Dict[str, Any]:
         """
         Return the historical mining difficulty of the Ethereum network. (PRO)
 
         https://docs.etherscan.io/api-endpoints/stats-1#get-daily-average-network-difficulty
 
-        :param str startdate: the starting date in yyyy-MM-dd format, eg. 2019-02-01
-        :param str enddate: the ending date in yyyy-MM-dd format, eg. 2019-02-28
-        :param Union[str, Sort] sort: the sorting preference, use "asc" to sort by ascending and "desc" to sort by descending ("asc")
-        :return Dict[str, Any]: the dictionary with the historical mining difficulty
+        Args:
+            startdate (str): the starting date in yyyy-MM-dd format, eg. 2019-02-01.
+            enddate (str): the ending date in yyyy-MM-dd format, eg. 2019-02-28.
+            sort (Union[str, Sort]): the sorting preference, use "asc" to sort by ascending and "desc" to sort
+                by descending. ("asc")
+
+        Returns:
+            Dict[str, Any]: the dictionary with the historical mining difficulty.
+
         """
         return await self.general(action='dailyavgnetdifficulty', startdate=startdate, enddate=enddate, sort=sort)
 
-    async def ethdailymarketcap(self, startdate: str, enddate: str,
-                                sort: Union[str, Sort] = Sort.Asc) -> Dict[str, Any]:
+    async def ethdailymarketcap(
+            self, startdate: str, enddate: str, sort: Union[str, Sort] = Sort.Asc
+    ) -> Dict[str, Any]:
         """
         Return the historical Ether daily market capitalization. (PRO)
 
         https://docs.etherscan.io/api-endpoints/stats-1#get-ether-historical-daily-market-cap
 
-        :param str startdate: the starting date in yyyy-MM-dd format, eg. 2019-02-01
-        :param str enddate: the ending date in yyyy-MM-dd format, eg. 2019-02-28
-        :param Union[str, Sort] sort: the sorting preference, use "asc" to sort by ascending and "desc" to sort by descending ("asc")
-        :return Dict[str, Any]: the dictionary with the historical Ether daily market capitalization
+        Args:
+            startdate (str): the starting date in yyyy-MM-dd format, eg. 2019-02-01.
+            enddate (str): the ending date in yyyy-MM-dd format, eg. 2019-02-28.
+            sort (Union[str, Sort]): the sorting preference, use "asc" to sort by ascending and "desc" to sort
+                by descending. ("asc")
+
+        Returns:
+            Dict[str, Any]: the dictionary with the historical Ether daily market capitalization.
+
         """
         return await self.general(action='ethdailymarketcap', startdate=startdate, enddate=enddate, sort=sort)
 
@@ -991,24 +1417,35 @@ class Stats:
 
         https://docs.etherscan.io/api-endpoints/stats-1#get-ether-historical-price
 
-        :param str startdate: the starting date in yyyy-MM-dd format, eg. 2019-02-01
-        :param str enddate: the ending date in yyyy-MM-dd format, eg. 2019-02-28
-        :param Union[str, Sort] sort: the sorting preference, use "asc" to sort by ascending and "desc" to sort by descending ("asc")
-        :return Dict[str, Any]: the dictionary with the historical price 1 ETH
+        Args:
+            startdate (str): the starting date in yyyy-MM-dd format, eg. 2019-02-01.
+            enddate (str): the ending date in yyyy-MM-dd format, eg. 2019-02-28.
+            sort (Union[str, Sort]): the sorting preference, use "asc" to sort by ascending and "desc" to sort
+                by descending. ("asc")
+
+        Returns:
+            Dict[str, Any]: the dictionary with the historical price 1 ETH.
+
         """
         return await self.general(action='ethdailyprice', startdate=startdate, enddate=enddate, sort=sort)
 
-    async def dailyavgblocksize(self, startdate: str, enddate: str,
-                                sort: Union[str, Sort] = Sort.Asc) -> Dict[str, Any]:
+    async def dailyavgblocksize(
+            self, startdate: str, enddate: str, sort: Union[str, Sort] = Sort.Asc
+    ) -> Dict[str, Any]:
         """
         Return the daily average block size within a date range. (PRO)
 
         https://docs.etherscan.io/api-endpoints/blocks#get-daily-average-block-size
 
-        :param str startdate: the starting date in yyyy-MM-dd format, eg. 2019-02-01
-        :param str enddate: the ending date in yyyy-MM-dd format, eg. 2019-02-28
-        :param Union[str, Sort] sort: the sorting preference, use "asc" to sort by ascending and "desc" to sort by descending ("asc")
-        :return Dict[str, Any]: the dictionary with the daily average block size within a date range
+        Args:
+            startdate (str): the starting date in yyyy-MM-dd format, eg. 2019-02-01.
+            enddate (str): the ending date in yyyy-MM-dd format, eg. 2019-02-28.
+            sort (Union[str, Sort]): the sorting preference, use "asc" to sort by ascending and "desc" to sort
+                by descending. ("asc")
+
+        Returns:
+            Dict[str, Any]: the dictionary with the daily average block size within a date range.
+
         """
         return await self.general(action='dailyavgblocksize', startdate=startdate, enddate=enddate, sort=sort)
 
@@ -1018,52 +1455,76 @@ class Stats:
 
         https://docs.etherscan.io/api-endpoints/blocks#get-daily-block-count-and-rewards
 
-        :param str startdate: the starting date in yyyy-MM-dd format, eg. 2019-02-01
-        :param str enddate: the ending date in yyyy-MM-dd format, eg. 2019-02-28
-        :param Union[str, Sort] sort: the sorting preference, use "asc" to sort by ascending and "desc" to sort by descending ("asc")
-        :return Dict[str, Any]: the dictionary with the number of blocks mined daily and the amount of block rewards
+        Args:
+            startdate (str): the starting date in yyyy-MM-dd format, eg. 2019-02-01.
+            enddate (str): the ending date in yyyy-MM-dd format, eg. 2019-02-28.
+            sort (Union[str, Sort]): the sorting preference, use "asc" to sort by ascending and "desc" to sort
+                by descending. ("asc")
+
+        Returns:
+            Dict[str, Any]: the dictionary with the number of blocks mined daily and the amount of block rewards.
+
         """
         return await self.general(action='dailyblkcount', startdate=startdate, enddate=enddate, sort=sort)
 
-    async def dailyblockrewards(self, startdate: str, enddate: str,
-                                sort: Union[str, Sort] = Sort.Asc) -> Dict[str, Any]:
+    async def dailyblockrewards(
+            self, startdate: str, enddate: str, sort: Union[str, Sort] = Sort.Asc
+    ) -> Dict[str, Any]:
         """
         Return the amount of block rewards distributed to miners daily. (PRO)
 
         https://docs.etherscan.io/api-endpoints/blocks#get-daily-block-rewards
 
-        :param str startdate: the starting date in yyyy-MM-dd format, eg. 2019-02-01
-        :param str enddate: the ending date in yyyy-MM-dd format, eg. 2019-02-28
-        :param Union[str, Sort] sort: the sorting preference, use "asc" to sort by ascending and "desc" to sort by descending ("asc")
-        :return Dict[str, Any]: the dictionary with the amount of block rewards distributed to miners daily
+        Args:
+            startdate (str): the starting date in yyyy-MM-dd format, eg. 2019-02-01.
+            enddate (str): the ending date in yyyy-MM-dd format, eg. 2019-02-28.
+            sort (Union[str, Sort]): the sorting preference, use "asc" to sort by ascending and "desc" to sort
+                by descending. ("asc")
+
+        Returns:
+            Dict[str, Any]: the dictionary with the amount of block rewards distributed to miners daily.
+
         """
         return await self.general(action='dailyblockrewards', startdate=startdate, enddate=enddate, sort=sort)
 
-    async def dailyavgblocktime(self, startdate: str, enddate: str,
-                                sort: Union[str, Sort] = Sort.Asc) -> Dict[str, Any]:
+    async def dailyavgblocktime(
+            self, startdate: str, enddate: str, sort: Union[str, Sort] = Sort.Asc
+    ) -> Dict[str, Any]:
         """
         Return the daily average of time needed for a block to be successfully mined. (PRO)
 
         https://docs.etherscan.io/api-endpoints/blocks#get-daily-average-time-for-a-block-to-be-included-in-the-ethereum-blockchain
 
-        :param str startdate: the starting date in yyyy-MM-dd format, eg. 2019-02-01
-        :param str enddate: the ending date in yyyy-MM-dd format, eg. 2019-02-28
-        :param Union[str, Sort] sort: the sorting preference, use "asc" to sort by ascending and "desc" to sort by descending ("asc")
-        :return Dict[str, Any]: the dictionary with the daily average of time needed for a block to be successfully mined
+        Args:
+            startdate (str): the starting date in yyyy-MM-dd format, eg. 2019-02-01.
+            enddate (str): the ending date in yyyy-MM-dd format, eg. 2019-02-28.
+            sort (Union[str, Sort]): the sorting preference, use "asc" to sort by ascending and "desc" to sort
+                by descending. ("asc")
+
+        Returns:
+            Dict[str, Any]: the dictionary with the daily average of time needed for a block to be successfully mined.
+
         """
         return await self.general(action='dailyavgblocktime', startdate=startdate, enddate=enddate, sort=sort)
 
-    async def dailyuncleblkcount(self, startdate: str, enddate: str,
-                                 sort: Union[str, Sort] = Sort.Asc) -> Dict[str, Any]:
+    async def dailyuncleblkcount(
+            self, startdate: str, enddate: str, sort: Union[str, Sort] = Sort.Asc
+    ) -> Dict[str, Any]:
         """
         Return the number of 'Uncle' blocks mined daily and the amount of 'Uncle' block rewards. (PRO)
 
         https://docs.etherscan.io/api-endpoints/blocks#get-daily-uncle-block-count-and-rewards
 
-        :param str startdate: the starting date in yyyy-MM-dd format, eg. 2019-02-01
-        :param str enddate: the ending date in yyyy-MM-dd format, eg. 2019-02-28
-        :param Union[str, Sort] sort: the sorting preference, use "asc" to sort by ascending and "desc" to sort by descending ("asc")
-        :return Dict[str, Any]: the dictionary with the number of 'Uncle' blocks mined daily and the amount of 'Uncle' block rewards
+        Args:
+            startdate (str): the starting date in yyyy-MM-dd format, eg. 2019-02-01.
+            enddate (str): the ending date in yyyy-MM-dd format, eg. 2019-02-28.
+            sort (Union[str, Sort]): the sorting preference, use "asc" to sort by ascending and "desc" to sort
+                by descending. ("asc")
+
+        Returns:
+            Dict[str, Any]: the dictionary with the number of 'Uncle' blocks mined daily and the amount of
+                'Uncle' block rewards.
+
         """
         return await self.general(action='dailyuncleblkcount', startdate=startdate, enddate=enddate, sort=sort)
 
@@ -1073,10 +1534,15 @@ class Stats:
 
         https://docs.etherscan.io/api-endpoints/gas-tracker#get-daily-average-gas-limit
 
-        :param str startdate: the starting date in yyyy-MM-dd format, eg. 2019-02-01
-        :param str enddate: the ending date in yyyy-MM-dd format, eg. 2019-02-28
-        :param Union[str, Sort] sort: the sorting preference, use "asc" to sort by ascending and "desc" to sort by descending ("asc")
-        :return Dict[str, Any]: the dictionary with the historical daily average gas limit of the Ethereum network
+        Args:
+            startdate (str): the starting date in yyyy-MM-dd format, eg. 2019-02-01.
+            enddate (str): the ending date in yyyy-MM-dd format, eg. 2019-02-28.
+            sort (Union[str, Sort]): the sorting preference, use "asc" to sort by ascending and "desc" to sort
+                by descending. ("asc")
+
+        Returns:
+            Dict[str, Any]: the dictionary with the historical daily average gas limit of the Ethereum network.
+
         """
         return await self.general(action='dailyavggaslimit', startdate=startdate, enddate=enddate, sort=sort)
 
@@ -1086,10 +1552,16 @@ class Stats:
 
         https://docs.etherscan.io/api-endpoints/gas-tracker#get-ethereum-daily-total-gas-used
 
-        :param str startdate: the starting date in yyyy-MM-dd format, eg. 2019-02-01
-        :param str enddate: the ending date in yyyy-MM-dd format, eg. 2019-02-28
-        :param Union[str, Sort] sort: the sorting preference, use "asc" to sort by ascending and "desc" to sort by descending ("asc")
-        :return Dict[str, Any]: the dictionary with the total amount of gas used daily for transctions on the Ethereum network
+        Args:
+            startdate (str): the starting date in yyyy-MM-dd format, eg. 2019-02-01.
+            enddate (str): the ending date in yyyy-MM-dd format, eg. 2019-02-28.
+            sort (Union[str, Sort]): the sorting preference, use "asc" to sort by ascending and "desc" to sort
+                by descending. ("asc")
+
+        Returns:
+            Dict[str, Any]: the dictionary with the total amount of gas used daily for transctions on the Ethereum
+                network.
+
         """
         return await self.general(action='dailygasused', startdate=startdate, enddate=enddate, sort=sort)
 
@@ -1099,10 +1571,15 @@ class Stats:
 
         https://docs.etherscan.io/api-endpoints/gas-tracker#get-daily-average-gas-price
 
-        :param str startdate: the starting date in yyyy-MM-dd format, eg. 2019-02-01
-        :param str enddate: the ending date in yyyy-MM-dd format, eg. 2019-02-28
-        :param Union[str, Sort] sort: the sorting preference, use "asc" to sort by ascending and "desc" to sort by descending ("asc")
-        :return Dict[str, Any]: the dictionary with the daily average gas price used on the Ethereum network
+        Args:
+            startdate (str): the starting date in yyyy-MM-dd format, eg. 2019-02-01.
+            enddate (str): the ending date in yyyy-MM-dd format, eg. 2019-02-28.
+            sort (Union[str, Sort]): the sorting preference, use "asc" to sort by ascending and "desc" to sort
+                by descending. ("asc")
+
+        Returns:
+            Dict[str, Any]: the dictionary with the daily average gas price used on the Ethereum network.
+
         """
         return await self.general(action='dailyavggasprice', startdate=startdate, enddate=enddate, sort=sort)
 
@@ -1112,8 +1589,12 @@ class Stats:
 
         https://docs.etherscan.io/api-endpoints/tokens#get-erc20-token-totalsupply-by-contractaddress
 
-        :param str contractaddress: the contract address of the ERC-20 token
-        :return Dict[str, Any]: the dictionary with the current amount of an ERC-20 token in circulation
+        Args:
+            contractaddress (str): the contract address of the ERC-20 token.
+
+        Returns:
+            Dict[str, Any]: the dictionary with the current amount of an ERC-20 token in circulation.
+
         """
         action = 'tokensupply'
         params = {
@@ -1130,9 +1611,13 @@ class Stats:
 
         https://docs.etherscan.io/api-endpoints/tokens#get-historical-erc20-token-totalsupply-by-contractaddress-and-blockno
 
-        :param str contractaddress: the contract address of the ERC-20 token
-        :param int blockno: the block number to check total supply
-        :return Dict[str, Any]: the dictionary with the amount of an ERC-20 token in circulation at a certain block height
+        Args:
+            contractaddress (str): the contract address of the ERC-20 token.
+            blockno (int): the block number to check total supply.
+
+        Returns:
+            Dict[str, Any]: the dictionary with the amount of an ERC-20 token in circulation at a certain block height.
+
         """
         action = 'tokensupplyhistory'
         params = {
