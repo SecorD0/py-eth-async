@@ -12,7 +12,7 @@ from pretty_utils.type_functions.classes import AutoRepr
 from web3 import Web3
 
 from py_eth_async import config
-from py_eth_async.explorer_api import APIFunctions
+from py_eth_async.blockscan_api import APIFunctions
 from py_eth_async.utils import checksum
 
 
