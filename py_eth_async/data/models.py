@@ -1000,6 +1000,21 @@ class TxArgs(AutoRepr):
         return tuple(self.__dict__.values())
 
 
+unit_denominations = {
+    'wei': 10 ** -18,
+    'kwei': 10 ** -15,
+    'mwei': 10 ** -12,
+    'gwei': 10 ** -9,
+    'szabo': 10 ** -6,
+    'finney': 10 ** -3,
+    'ether': 1,
+    'kether': 10 ** 3,
+    'mether': 10 ** 6,
+    'gether': 10 ** 9,
+    'tether': 10 ** 12,
+}
+
+
 class Unit(AutoRepr):
     """
     An instance of an Ethereum unit.
@@ -1138,11 +1153,21 @@ class Unit(AutoRepr):
             raise ArithmeticError(f"{type(other)} type isn't supported!")
 
     def __mul__(self, other):
-        if isinstance(other, (Unit, TokenAmount)):
+        if isinstance(other, TokenAmount):
             if self.decimals != other.decimals:
                 raise ArithmeticError('The values have different decimals!')
 
-            return Wei(self.Wei * other.Wei)
+            if self.unit != 'ether':
+                raise ArithmeticError('You can only perform this action with an Ether unit!')
+
+            return Ether(Decimal(str(self.Ether)) * Decimal(str(other.Ether)))
+
+        if isinstance(other, Unit):
+            if isinstance(other, Unit) and self.unit != other.unit:
+                raise ArithmeticError('The units are different!')
+
+            denominations = int(Decimal(str(unit_denominations[self.unit])) * Decimal(str(10 ** self.decimals)))
+            return Wei(self.Wei * other.Wei / denominations)
 
         elif isinstance(other, int):
             return Wei(self.Wei * other)
@@ -1158,11 +1183,21 @@ class Unit(AutoRepr):
             raise ArithmeticError(f"{type(other)} type isn't supported!")
 
     def __rmul__(self, other):
-        if isinstance(other, (Unit, TokenAmount)):
+        if isinstance(other, TokenAmount):
             if self.decimals != other.decimals:
                 raise ArithmeticError('The values have different decimals!')
 
-            return Wei(other.Wei * self.Wei)
+            if self.unit != 'ether':
+                raise ArithmeticError('You can only perform this action with an Ether unit!')
+
+            return Ether(Decimal(str(other.Ether)) * Decimal(str(self.Ether)))
+
+        if isinstance(other, Unit):
+            if isinstance(other, Unit) and self.unit != other.unit:
+                raise ArithmeticError('The units are different!')
+
+            denominations = int(Decimal(str(unit_denominations[self.unit])) * Decimal(str(10 ** self.decimals)))
+            return Wei(other.Wei * self.Wei / denominations)
 
         elif isinstance(other, int):
             return Wei(other * self.Wei)
@@ -1178,11 +1213,21 @@ class Unit(AutoRepr):
             raise ArithmeticError(f"{type(other)} type isn't supported!")
 
     def __truediv__(self, other):
-        if isinstance(other, (Unit, TokenAmount)):
+        if isinstance(other, TokenAmount):
             if self.decimals != other.decimals:
                 raise ArithmeticError('The values have different decimals!')
 
-            return Wei(self.Wei / other.Wei)
+            if self.unit != 'ether':
+                raise ArithmeticError('You can only perform this action with an Ether unit!')
+
+            return Ether(Decimal(str(self.Ether)) / Decimal(str(other.Ether)))
+
+        if isinstance(other, Unit):
+            if isinstance(other, Unit) and self.unit != other.unit:
+                raise ArithmeticError('The units are different!')
+
+            denominations = int(Decimal(str(unit_denominations[self.unit])) * Decimal(str(10 ** self.decimals)))
+            return Wei(self.Wei / other.Wei * denominations)
 
         elif isinstance(other, int):
             return Wei(self.Wei / Decimal(str(other)))
@@ -1198,11 +1243,21 @@ class Unit(AutoRepr):
             raise ArithmeticError(f"{type(other)} type isn't supported!")
 
     def __rtruediv__(self, other):
-        if isinstance(other, (Unit, TokenAmount)):
+        if isinstance(other, TokenAmount):
             if self.decimals != other.decimals:
                 raise ArithmeticError('The values have different decimals!')
 
-            return Wei(other.Wei / self.Wei)
+            if self.unit != 'ether':
+                raise ArithmeticError('You can only perform this action with an Ether unit!')
+
+            return Ether(Decimal(str(other.Ether)) / Decimal(str(self.Ether)))
+
+        if isinstance(other, Unit):
+            if isinstance(other, Unit) and self.unit != other.unit:
+                raise ArithmeticError('The units are different!')
+
+            denominations = int(Decimal(str(unit_denominations[self.unit])) * Decimal(str(10 ** self.decimals)))
+            return Wei(other.Wei / self.Wei * denominations)
 
         elif isinstance(other, int):
             return Wei(Decimal(str(other)) / self.Wei)
