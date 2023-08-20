@@ -1,4 +1,4 @@
-from typing import Union, Optional, Dict, Any, Tuple
+from typing import Union, Optional, Dict, Any, Tuple, List
 
 from eth_account.datastructures import SignedTransaction, SignedMessage
 from eth_account.messages import encode_defunct
@@ -458,15 +458,16 @@ class Transactions:
 
     @api_key_required
     async def find_txs(
-            self, contract: types.Contract, function_name: Optional[str] = '', address: Optional[types.Address] = None,
-            after_timestamp: int = 0, before_timestamp: int = 999_999_999_999
+            self, contract: Union[types.Contract, List[types.Contract]], function_name: Optional[str] = '',
+            address: Optional[types.Address] = None, after_timestamp: int = 0, before_timestamp: int = 999_999_999_999
     ) -> Dict[str, CoinTx]:
         """
         Find all transactions of interaction with the contract, in addition, you can filter transactions by
             the name of the contract function.
 
         Args:
-            contract (Contract): the contract address or instance with which the interaction took place.
+            contract (Union[Contract, List[Contract]]): the contract or a list of contracts with which
+                the interaction took place.
             function_name (Optional[str]): the function name for sorting. (any)
             address (Optional[Address]): the address to get the transaction list. (imported to client address)
             after_timestamp (int): after what time to filter transactions. (0)
@@ -476,7 +477,16 @@ class Transactions:
             Dict[str, CoinTx]: transactions found.
 
         """
-        contract_address, abi = await self.client.contracts.get_contract_attributes(contract)
+        contract_addresses = []
+        if isinstance(contract, list):
+            for contract_ in contract:
+                contract_address, abi = await self.client.contracts.get_contract_attributes(contract_)
+                contract_addresses.append(contract_address.lower())
+
+        else:
+            contract_address, abi = await self.client.contracts.get_contract_attributes(contract)
+            contract_addresses.append(contract_address.lower())
+
         if not address:
             address = self.client.account.address
 
@@ -486,7 +496,7 @@ class Transactions:
             if (
                     after_timestamp < int(tx.get('timeStamp')) < before_timestamp and
                     tx.get('isError') == '0' and
-                    tx.get('to') == contract_address.lower() and
+                    tx.get('to') in contract_addresses and
                     function_name in tx.get('functionName')
             ):
                 txs[tx.get('hash')] = CoinTx(data=tx)
