@@ -180,7 +180,7 @@ class Networks:
         )
     )
     ArbitrumNova = Network(
-        name='arbitrum_nova',
+        name='arbitrum nova',
         rpc='https://nova.arbitrum.io/rpc/',
         chain_id=42170,
         tx_type=2,
@@ -238,7 +238,10 @@ class Networks:
         tx_type=2,
         coin_symbol='AVAX',
         explorer='https://snowtrace.io/',
-        api=API(key=config.AVALANCHE_API_KEY, url='https://api.snowtrace.io/api', docs='https://docs.snowtrace.io/')
+        api=API(
+            key=config.AVALANCHE_API_KEY, url='https://api.routescan.io/v2/network/mainnet/evm/43114/etherscan/api',
+            docs='https://snowtrace.io/documentation'
+        )
     )
     Moonbeam = Network(
         name='moonbeam',
