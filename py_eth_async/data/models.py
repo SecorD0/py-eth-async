@@ -243,6 +243,17 @@ class Networks:
             docs='https://snowtrace.io/documentation'
         )
     )
+    zkSyncEra = Network(
+        name='zksync era',
+        rpc='https://rpc.ankr.com/zksync_era/',
+        chain_id=324,
+        tx_type=0,
+        coin_symbol='ETH',
+        explorer='https://era.zksync.network/',
+        api=API(
+            key=config.ZKSYNC_ERA_API_KEY, url='https://api-era.zksync.network/api', docs='https://docs.zksync.network/'
+        )
+    )
     Moonbeam = Network(
         name='moonbeam',
         rpc='https://rpc.api.moonbeam.network/',
