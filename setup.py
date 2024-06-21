@@ -7,7 +7,7 @@ with open(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'README.md'),
 
 setup(
     name='py-eth-async',
-    version='1.10.2',
+    version='1.10.3',
     license='Apache-2.0',
     author='SecorD',
     description='',
@@ -15,9 +15,10 @@ setup(
     long_description=long_description,
     packages=find_packages(),
     install_requires=[
-        'aiohttp-socks', 'evmdasm @ git+https://github.com/SecorD0/evmdasm@e8389f223746a0d8c94c627397d0dc639633e869',
-        'fake-useragent', 'pretty-utils @ git+https://github.com/SecorD0/pretty-utils@main', 'PySocks', 'python-dotenv',
-        'web3 @ git+https://github.com/ethereum/web3.py@v6.0.0-beta.9'
+        'aiohttp-socks==0.8.0', 'aiohttp==3.9.3', 'eth-account==0.8.0',
+        'evmdasm @ git+https://github.com/SecorD0/evmdasm@e8389f223746a0d8c94c627397d0dc639633e869',
+        'fake-useragent', 'pretty-utils @ git+https://github.com/SecorD0/pretty-utils@main', 'PySocks==1.7.1',
+        'python-dotenv==0.21.1', 'web3 @ git+https://github.com/ethereum/web3.py@v6.0.0-beta.9'
     ],
     keywords=[
         'eth', 'pyeth', 'py-eth', 'ethpy', 'eth-py', 'web3', 'pyweb3', 'py-web3', 'web3py', 'web3-py', 'async-eth',
