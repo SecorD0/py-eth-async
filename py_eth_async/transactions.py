@@ -646,7 +646,7 @@ class Transactions:
         if 'value' in tx_params:
             balance = (await self.client.wallet.balance()).Wei
             gas_price = tx_params.get('gasPrice') if 'gasPrice' in tx_params else tx_params.get('maxFeePerGas')
-            available_to_send = balance - gas_price * tx_params.get('gas')
+            available_to_send = balance - int(gas_price * tx_params.get('gas') * 1.1)
             if available_to_send < amount:
                 tx_params['value'] = available_to_send
 
